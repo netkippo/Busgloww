@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusGlow | Pago</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --blue: #0b2d4d;
+            --green: #16a085;
+            --muted: #718096;
+            --background: #f5f7fa;
+            --border: #e4e8ed;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body { font-family: "Inter", sans-serif; background: var(--background); color: #263238; }
+
+        button, input { font-family: inherit; }
+
+        header {
+            height: 72px; background: white; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 6%; border-bottom: 1px solid #eee;
+        }
+
+        .logo { text-decoration: none; color: var(--blue); font-size: 25px; font-weight: 800; }
+        .logo span { color: var(--primary); }
+
+        .secure { color: var(--green); font-size: 13px; font-weight: 700; }
+
+        main { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+
+        .page-title { margin-bottom: 25px; }
+        .page-title h1 { color: var(--blue); font-size: 30px; margin-bottom: 8px; }
+        .page-title p { color: var(--muted); font-size: 15px; }
+
+        .timer {
+            display: inline-flex; align-items: center; gap: 8px; background: #fff8e6; color: #8a5a00;
+            border: 1px solid #ffe2a8; padding: 8px 14px; border-radius: 30px; font-size: 13px; font-weight: 700; margin-top: 12px;
+        }
+        .timer.urgent { background: #ffecec; color: var(--primary); border-color: #ffc9c7; }
+
+        .content { display: grid; grid-template-columns: 1fr 360px; gap: 30px; align-items: start; }
+
+        .card { background: white; border-radius: 18px; padding: 28px; box-shadow: var(--shadow); }
+        .card h2 { color: var(--blue); font-size: 19px; margin-bottom: 20px; }
+
+        .methods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+        .method {
+            border: 1px solid var(--border); border-radius: 12px; background: white; padding: 14px 8px; cursor: pointer;
+            font-size: 13px; font-weight: 700; color: #475569; transition: .2s;
+        }
+        .method span { display: block; font-size: 22px; margin-bottom: 5px; }
+        .method.active { border-color: var(--primary); background: #fff5f5; color: var(--primary); box-shadow: 0 0 0 3px rgba(229,57,53,.08); }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full { grid-column: 1 / -1; }
+
+        label { display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 7px; }
+        input {
+            width: 100%; height: 48px; border: 1px solid var(--border); border-radius: 8px; padding: 0 13px;
+            font-size: 14px; outline: none;
+        }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(229,57,53,.08); }
+
+        .test-cards { margin-top: 16px; background: #f8fafc; border-radius: 10px; padding: 12px 14px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+        .test-cards code { color: var(--blue); font-weight: 700; }
+
+        .pay-button {
+            width: 100%; border: none; background: var(--primary); color: white; padding: 15px; border-radius: 10px;
+            font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 22px; transition: .2s;
+        }
+        .pay-button:hover { background: var(--primary-dark); }
+        .pay-button:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+        .cancel-link { display: block; text-align: center; margin-top: 14px; color: var(--muted); font-size: 13px; background: none; border: 0; cursor: pointer; width: 100%; }
+
+        .route { background: #f8fafc; border-radius: 12px; padding: 15px; margin-bottom: 18px; }
+        .route small { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+        .route strong { display: block; color: var(--blue); font-size: 16px; margin-top: 4px; }
+
+        .row { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 12px; font-size: 14px; }
+        .row span:first-child { color: var(--muted); }
+        .row span:last-child { color: var(--blue); font-weight: 700; text-align: right; }
+
+        .pax { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px; font-size: 13px; }
+        .pax div { display: flex; justify-content: space-between; margin-bottom: 7px; color: #475569; }
+
+        .total { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); margin-top: 16px; padding-top: 16px; }
+        .total span:first-child { color: var(--blue); font-weight: 700; }
+        .total span:last-child { color: var(--primary); font-size: 25px; font-weight: 800; }
+
+        .state { text-align: center; padding: 50px 20px; }
+        .state h2 { color: var(--blue); margin-bottom: 10px; }
+        .state p { color: var(--muted); margin-bottom: 20px; }
+        .state a { display: inline-block; background: var(--primary); color: white; padding: 12px 20px; border-radius: 8px; font-weight: 700; text-decoration: none; }
+
+        @media (max-width: 850px) { .content { grid-template-columns: 1fr; } }
+        @media (max-width: 500px) {
+            header { padding: 0 20px; }
+            .methods { grid-template-columns: 1fr 1fr; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html" class="logo">Bus<span>Glow</span></a>
+        <span class="secure">🔒 Pago seguro</span>
+    </header>
+
+    <main id="app">
+        <div class="card state"><p>Cargando reserva...</p></div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        const { api, fmt, esc, params, toast, session, requireLogin } = BusGlow;
+        requireLogin();
+
+        const idReserva = parseInt(params.get("reserva"), 10);
+        let reserva = null;
+        let metodo = "TARJETA";
+        let timer = null;
+
+        const app = document.getElementById("app");
+
+        function estadoFinal(titulo, texto, enlace, etiqueta) {
+            clearInterval(timer);
+            app.innerHTML = `<div class="card state"><h2>${titulo}</h2><p>${texto}</p><a href="${enlace}">${etiqueta}</a></div>`;
+        }
+
+        async function cargar() {
+            try {
+                reserva = await api(`/reservas/${idReserva}`);
+            } catch (err) {
+                return estadoFinal("No encontramos la reserva", esc(err.message), "index.html", "Volver al inicio");
+            }
+
+            if (reserva.estado === "Confirmada") return location.replace(`boleto.html?reserva=${idReserva}`);
+            if (reserva.estado === "Expirada") {
+                return estadoFinal("⏰ El tiempo para pagar terminó", "Los asientos fueron liberados. Vuelve a seleccionarlos.",
+                    `asientos.html?viaje=${reserva.id_viaje}`, "Elegir asientos otra vez");
+            }
+            if (reserva.estado !== "Pendiente") {
+                return estadoFinal(`Reserva ${reserva.estado.toLowerCase()}`, "Esta reserva ya no está disponible para pago.", "index.html", "Buscar otro viaje");
+            }
+            pintar();
+            iniciarTimer(reserva.segundos_restantes);
+        }
+
+        function pintar() {
+            const v = reserva.viaje;
+            const activos = reserva.asientos.filter(a => a.activo);
+            const efectivo = session.isStaff
+                ? `<button class="method" data-m="EFECTIVO"><span>💵</span>Efectivo</button>` : "";
+
+            app.innerHTML = `
+                <div class="page-title">
+                    <h1>Completa tu pago</h1>
+                    <p>Reserva #${reserva.id_reserva} · Tus asientos están bloqueados temporalmente.</p>
+                    <div class="timer" id="timer">⏱ --:--</div>
+                </div>
+
+                <div class="content">
+                    <section class="card">
+                        <h2>Método de pago</h2>
+                        <div class="methods">
+                            <button class="method active" data-m="TARJETA"><span>💳</span>Tarjeta</button>
+                            <button class="method" data-m="YAPE"><span>📱</span>Yape</button>
+                            <button class="method" data-m="PLIN"><span>📲</span>Plin</button>
+                            ${efectivo}
+                        </div>
+
+                        <form id="payForm" novalidate>
+                            <div id="fields"></div>
+                            <button class="pay-button" id="payBtn" type="submit">Pagar ${fmt.money(reserva.total)}</button>
+                        </form>
+                        <button class="cancel-link" id="cancelBtn">Cancelar reserva y liberar asientos</button>
+                    </section>
+
+                    <aside class="card">
+                        <h2>Resumen de compra</h2>
+                        <div class="route">
+                            <small>Ruta</small>
+                            <strong>${esc(v.origen)} → ${esc(v.destino)}</strong>
+                        </div>
+                        <div class="row"><span>Empresa</span><span>${esc(v.empresa)}</span></div>
+                        <div class="row"><span>Salida</span><span>${fmt.fecha(v.fecha_salida)} · ${v.hora_salida}</span></div>
+                        <div class="row"><span>Terminal</span><span>${esc(v.terminal_origen || "-")}</span></div>
+                        <div class="row"><span>Servicio</span><span>${esc(v.tipo_servicio)}</span></div>
+                        <div class="pax">
+                            ${activos.map(a => `<div><span>Asiento ${esc(a.numero)} · ${esc(a.nombres)} ${esc(a.apellidos)}</span><span>${fmt.money(a.precio)}</span></div>`).join("")}
+                        </div>
+                        <div class="total"><span>Total</span><span>${fmt.money(reserva.total)}</span></div>
+                    </aside>
+                </div>`;
+
+            app.querySelectorAll(".method").forEach(b => b.addEventListener("click", () => {
+                metodo = b.dataset.m;
+                app.querySelectorAll(".method").forEach(x => x.classList.toggle("active", x === b));
+                pintarCampos();
+            }));
+            document.getElementById("payForm").addEventListener("submit", pagar);
+            document.getElementById("cancelBtn").addEventListener("click", cancelar);
+            pintarCampos();
+        }
+
+        function pintarCampos() {
+            const f = document.getElementById("fields");
+            if (metodo === "TARJETA") {
+                f.innerHTML = `
+                    <div class="grid">
+                        <div class="full"><label>NÚMERO DE TARJETA</label><input id="numero" inputmode="numeric" autocomplete="cc-number" placeholder="4111 1111 1111 1111" maxlength="23"></div>
+                        <div class="full"><label>TITULAR</label><input id="titular" autocomplete="cc-name" placeholder="Como figura en la tarjeta"></div>
+                        <div><label>VENCIMIENTO (MM/AA)</label><input id="vencimiento" autocomplete="cc-exp" placeholder="12/28" maxlength="5"></div>
+                        <div><label>CVV</label><input id="cvv" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4"></div>
+                    </div>
+                    <div class="test-cards">
+                        Pasarela de pagos en <b>modo de prueba</b>. Tarjetas de ejemplo:<br>
+                        <code>4111 1111 1111 1111</code> aprobada · <code>4000 0000 0000 0002</code> rechazada
+                    </div>`;
+                const num = document.getElementById("numero");
+                num.addEventListener("input", () => {
+                    num.value = num.value.replace(/\D/g, "").slice(0, 19).replace(/(\d{4})(?=\d)/g, "$1 ");
+                });
+                const venc = document.getElementById("vencimiento");
+                venc.addEventListener("input", () => {
+                    const d = venc.value.replace(/\D/g, "").slice(0, 4);
+                    venc.value = d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+                });
+            } else if (metodo === "YAPE" || metodo === "PLIN") {
+                f.innerHTML = `
+                    <div class="grid">
+                        <div><label>CELULAR ${metodo}</label><input id="celular" inputmode="numeric" placeholder="987654321" maxlength="9"></div>
+                        <div><label>CÓDIGO DE APROBACIÓN</label><input id="codigo" inputmode="numeric" placeholder="6 dígitos" maxlength="6"></div>
+                    </div>
+                    <div class="test-cards">Genera el código de aprobación en tu app ${metodo} (en modo de prueba cualquier código de 6 dígitos es válido).</div>`;
+            } else {
+                f.innerHTML = `<div class="test-cards">Venta en ventanilla: confirma que recibiste <b>${fmt.money(reserva.total)}</b> en efectivo.</div>`;
+            }
+        }
+
+        function iniciarTimer(segundos) {
+            let restante = Math.max(0, segundos || 0);
+            const el = () => document.getElementById("timer");
+            const tick = () => {
+                if (!el()) return;
+                const m = Math.floor(restante / 60), s = restante % 60;
+                el().textContent = `⏱ Tiempo restante para pagar: ${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+                el().classList.toggle("urgent", restante < 120);
+                if (restante <= 0) {
+                    estadoFinal("⏰ El tiempo para pagar terminó", "Los asientos fueron liberados. Vuelve a seleccionarlos.",
+                        `asientos.html?viaje=${reserva.id_viaje}`, "Elegir asientos otra vez");
+                }
+                restante--;
+            };
+            tick();
+            timer = setInterval(tick, 1000);
+        }
+
+        async function pagar(e) {
+            e.preventDefault();
+            const val = id => (document.getElementById(id) || {}).value || "";
+            let datos = {};
+            if (metodo === "TARJETA") {
+                datos = { numero: val("numero"), titular: val("titular"), vencimiento: val("vencimiento"), cvv: val("cvv") };
+                if (!datos.titular.trim()) return toast("Ingresa el nombre del titular.", "warn");
+            } else if (metodo === "YAPE" || metodo === "PLIN") {
+                datos = { celular: val("celular"), codigo_aprobacion: val("codigo") };
+            }
+
+            const btn = document.getElementById("payBtn");
+            btn.disabled = true;
+            btn.textContent = "Procesando pago...";
+            try {
+                await api(`/reservas/${idReserva}/pagar`, { method: "POST", body: { metodo_pago: metodo, datos } });
+                clearInterval(timer);
+                toast("✅ ¡Pago aprobado! Emitiendo tus boletos...", "ok");
+                setTimeout(() => location.href = `boleto.html?reserva=${idReserva}&nuevo=1`, 700);
+            } catch (err) {
+                toast(err.message, "error", 6000);
+                btn.disabled = false;
+                btn.textContent = `Pagar ${fmt.money(reserva.total)}`;
+                if (err.status === 410) cargar();
+            }
+        }
+
+        async function cancelar() {
+            if (!confirm("¿Deseas cancelar la reserva y liberar los asientos?")) return;
+            try {
+                await api(`/reservas/${idReserva}/cancelar`, { method: "POST" });
+                estadoFinal("Reserva cancelada", "Los asientos fueron liberados.", `asientos.html?viaje=${reserva.id_viaje}`, "Elegir otros asientos");
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        }
+
+        cargar();
+    </script>
+
+</body>
+</html>

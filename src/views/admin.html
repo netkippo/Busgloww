@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusGlow | Panel de administración</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --blue: #0b2d4d;
+            --blue-light: #164a73;
+            --green: #16a085;
+            --orange: #ff7a00;
+            --text: #263238;
+            --muted: #718096;
+            --background: #f5f7fa;
+            --border: #e4e8ed;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Inter", sans-serif; background: var(--background); color: var(--text); }
+        a { color: inherit; text-decoration: none; }
+        button, input, select, textarea { font-family: inherit; }
+
+        /* HEADER */
+        header {
+            height: 64px; background: white; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 24px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 50;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; color: var(--blue); }
+        .logo-icon {
+            width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--primary), #ff7043); color: white; border-radius: 10px; font-size: 19px;
+        }
+        .logo span { color: var(--primary); }
+        .logo small { font-size: 12px; color: var(--muted); font-weight: 600; margin-left: 4px; }
+        .header-right { display: flex; align-items: center; gap: 16px; font-size: 13px; }
+        .header-right b { color: var(--blue); }
+        .header-right a, .header-right button {
+            border: 1px solid var(--border); background: white; padding: 8px 12px; border-radius: 8px; font-weight: 700;
+            font-size: 12px; color: #475569; cursor: pointer;
+        }
+        .menu-toggle { display: none; }
+
+        /* LAYOUT */
+        .layout { display: grid; grid-template-columns: 230px 1fr; min-height: calc(100vh - 64px); }
+        aside.sidebar { background: #081c2c; padding: 18px 12px; color: #c9d6e0; }
+        .sidebar h4 { font-size: 10px; letter-spacing: 1px; color: #6f8596; margin: 16px 10px 8px; text-transform: uppercase; }
+        .sidebar button {
+            display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; background: transparent; border: 0;
+            color: #c9d6e0; padding: 10px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+        .sidebar button:hover { background: rgba(255,255,255,.06); color: white; }
+        .sidebar button.active { background: var(--primary); color: white; }
+
+        main { padding: 28px; min-width: 0; }
+        .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+        .page-head h1 { color: var(--blue); font-size: 25px; }
+        .page-head p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+        .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+        .btn {
+            border: 1px solid var(--border); background: white; color: var(--blue); padding: 9px 14px; border-radius: 8px;
+            font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;
+        }
+        .btn:hover { border-color: #cbd5e1; }
+        .btn.primary { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn.primary:hover { background: var(--primary-dark); }
+        .btn.sm { padding: 6px 9px; font-size: 11px; }
+        .btn.danger { color: var(--primary); border-color: #ffd2cf; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+        .input, select.input, textarea.input {
+            height: 38px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; font-size: 13px; background: white; outline: none;
+        }
+        textarea.input { height: 80px; padding: 10px; resize: vertical; width: 100%; }
+        .input:focus { border-color: var(--primary); }
+
+        .card { background: white; border-radius: 14px; box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+        .card h2 { color: var(--blue); font-size: 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .card h2 small { color: var(--muted); font-weight: 600; font-size: 12px; }
+
+        /* KPIs (tiles con número principal) */
+        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .kpi { background: white; border-radius: 14px; box-shadow: var(--shadow); padding: 18px; }
+        .kpi span { color: var(--muted); font-size: 12px; font-weight: 600; }
+        .kpi strong { display: block; color: var(--blue); font-size: 26px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+
+        /* TABLAS */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; padding: 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        td { padding: 11px 10px; border-bottom: 1px solid #f1f4f7; vertical-align: middle; }
+        td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+        tr:hover td { background: #fafcfd; }
+        .actions-cell { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+        .search { width: 240px; }
+
+        .badge { display: inline-block; padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+        .b-Programado { background: #eef4fb; color: var(--blue); }
+        .b-Embarcando, .b-Proximo { background: #fff8e6; color: #9a6b00; }
+        .b-Salido { background: #e6f6ff; color: #0369a1; }
+        .b-Retrasado { background: #fff1e6; color: #c2410c; }
+        .b-Cancelado { background: #ffecec; color: var(--primary); }
+        .b-Finalizado { background: #f1f5f9; color: #64748b; }
+        .b-on { background: #eafaf5; color: var(--green); }
+        .b-off { background: #f1f5f9; color: #94a3b8; }
+        .late { color: #c2410c; font-weight: 700; }
+
+        /* Barra de proporción (serie única) */
+        .bar { display: flex; align-items: center; gap: 8px; min-width: 130px; }
+        .bar-track { flex: 1; height: 8px; background: #eef2f5; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--blue-light); border-radius: 0 4px 4px 0; }
+        .bar b { font-size: 12px; color: var(--text); min-width: 42px; text-align: right; font-variant-numeric: tabular-nums; }
+
+        /* Gráfico de columnas (ventas por día) */
+        .cols { display: flex; align-items: flex-end; gap: 2px; height: 180px; padding-top: 10px; border-bottom: 1px solid var(--border); position: relative; }
+        .col { flex: 1; background: var(--blue-light); border-radius: 4px 4px 0 0; min-height: 2px; position: relative; cursor: default; }
+        .col:hover { background: var(--blue); }
+        .col .tip {
+            display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #0b2d4d;
+            color: white; padding: 6px 8px; border-radius: 6px; font-size: 11px; white-space: nowrap; z-index: 5;
+        }
+        .col:hover .tip { display: block; }
+        .cols-axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-top: 6px; }
+
+        /* ALERTAS */
+        .alert { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; margin-bottom: 8px; border: 1px solid; font-size: 13px; }
+        .alert.alto { background: #fff1f0; border-color: #ffd2cf; }
+        .alert.medio { background: #fff8e6; border-color: #ffe2a8; }
+        .alert.bajo { background: #f0f7ff; border-color: #d4e6fb; }
+        .alert .ico { font-size: 18px; }
+        .alert b { color: var(--blue); }
+        .alert .btn { margin-left: auto; }
+
+        /* MODAL */
+        .modal-bg { position: fixed; inset: 0; background: rgba(8,28,44,.55); display: none; align-items: flex-start; justify-content: center; padding: 50px 16px; z-index: 100; overflow-y: auto; }
+        .modal-bg.open { display: flex; }
+        .modal { background: white; border-radius: 16px; width: 100%; max-width: 640px; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+        .modal.wide { max-width: 900px; }
+        .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .modal-head h3 { color: var(--blue); font-size: 18px; }
+        .modal-head button { border: 0; background: #f1f5f9; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-grid .full { grid-column: 1 / -1; }
+        .form-grid label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
+        .form-grid .input { width: 100%; height: 42px; }
+        .form-grid textarea.input { height: 80px; }
+        .form-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+        .form-note { color: var(--muted); font-size: 12px; margin-top: 12px; background: #f8fafc; border-radius: 8px; padding: 10px; }
+
+        .detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+        .detail-grid div small { display: block; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .detail-grid div b { color: var(--blue); font-size: 13px; }
+
+        /* Mapa de asientos (mantenimiento) */
+        .seat-map { display: grid; grid-template-columns: 1fr 1fr 20px 1fr 1fr; gap: 8px; max-width: 320px; margin: auto; background: #eef2f5; padding: 16px; border-radius: 20px; }
+        .seat-map button { height: 40px; border-radius: 8px; border: 1px solid #b9ead9; background: #dff6ed; color: #16815f; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .seat-map button.m { background: #e2e8f0; color: #94a3b8; border-color: #cbd5e1; text-decoration: line-through; }
+
+        .empty { text-align: center; color: var(--muted); padding: 30px; font-size: 13px; }
+        .check { display: flex !important; gap: 10px; align-items: flex-start; font-size: 13px !important; color: var(--text) !important; cursor: pointer; text-transform: none !important; font-weight: 500 !important; }
+        .check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--primary); }
+        .disp { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #475569; margin-top: 14px; }
+        .disp b { color: var(--blue); }
+        .disp .motivo { color: #c2410c; margin-top: 6px; }
+        .b-Ruta { background: #e6f6ff; color: #0369a1; }
+        .b-Descansa { background: #fff8e6; color: #9a6b00; }
+        .b-Disponible { background: #eafaf5; color: var(--green); }
+        .muted { color: var(--muted); font-size: 12px; }
+
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+            aside.sidebar { display: none; position: fixed; top: 64px; left: 0; bottom: 0; width: 240px; z-index: 60; overflow-y: auto; }
+            aside.sidebar.open { display: block; }
+            .menu-toggle { display: inline-block; }
+            main { padding: 18px 16px; }
+            .form-grid, .detail-grid { grid-template-columns: 1fr; }
+            .header-right .who { display: none; }
+            .search { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div style="display:flex;align-items:center;gap:12px">
+            <button class="btn menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+            <a href="index.html" class="logo"><div class="logo-icon">🚌</div>Bus<span>Glow</span><small>Panel</small></a>
+        </div>
+        <div class="header-right">
+            <span class="who">Hola, <b id="who"></b></span>
+            <a href="index.html">🛒 Nueva venta</a>
+            <button onclick="BusGlow.logout()">Salir</button>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar"></aside>
+        <main id="main"></main>
+    </div>
+
+    <div class="modal-bg" id="modalBg">
+        <div class="modal" id="modal">
+            <div class="modal-head"><h3 id="modalTitle"></h3><button onclick="cerrarModal()" aria-label="Cerrar">✕</button></div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+    const { api, fmt, esc, toast, session, requireLogin } = BusGlow;
+    const usuario = requireLogin();
+    if (!session.isStaff) { location.replace("perfil.html"); }
+    const ROL = usuario ? usuario.rol : "";
+    const ES_ADMIN = ROL === "ADMIN";
+    const ES_EMPRESA = ROL === "EMPRESA";
+    const PUEDE_PROGRAMAR = ES_ADMIN || ES_EMPRESA;       // programar, reprogramar y cancelar viajes
+    document.getElementById("who").textContent = `${usuario.nombres} (${usuario.empresa ? usuario.empresa + " · " : ""}${ROL})`;
+
+    const $ = id => document.getElementById(id);
+    const main = $("main");
+    const ESTADOS = ["Programado", "Embarcando", "Proximo a salir", "Salido", "Retrasado", "Cancelado", "Finalizado"];
+    let refresco = null;
+
+    /* =====================================================================
+       Utilidades de UI
+       ===================================================================== */
+    function abrirModal(titulo, html, wide = false) {
+        $("modalTitle").textContent = titulo;
+        $("modalBody").innerHTML = html;
+        $("modal").classList.toggle("wide", wide);
+        $("modalBg").classList.add("open");
+    }
+    function cerrarModal() { $("modalBg").classList.remove("open"); }
+    $("modalBg").addEventListener("click", e => { if (e.target.id === "modalBg") cerrarModal(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarModal(); });
+
+    const badgeEstado = e => `<span class="badge b-${esc(e.split(" ")[0])}">${esc(e)}</span>`;
+    const badgeBool = v => v ? '<span class="badge b-on">Activo</span>' : '<span class="badge b-off">Inactivo</span>';
+    const barra = (pct, texto) => {
+        const p = Math.max(0, Math.min(100, Number(pct) || 0));
+        return `<div class="bar"><div class="bar-track"><div class="bar-fill" style="width:${p}%"></div></div><b>${texto ?? p.toFixed(1) + " %"}</b></div>`;
+    };
+
+    /** Construye un formulario a partir de una lista de campos. */
+    async function construirFormulario(campos, valores = {}, esNuevo = true) {
+        const partes = [];
+        for (const c of campos) {
+            if (c.soloCrear && !esNuevo) continue;
+            if (c.soloEditar && esNuevo) continue;
+            if (c.soloAdmin && !ES_ADMIN) continue;
+            const v = valores[c.name] ?? c.default ?? "";
+            if (c.type === "check") {
+                partes.push(`<div class="full"><label class="check"><input type="checkbox" name="${c.name}" ${v === true || v === 1 ? "checked" : ""}>
+                    <span>${esc(c.label)}</span></label></div>`);
+                continue;
+            }
+            const req = c.required ? "required" : "";
+            let input;
+            if (c.type === "select" || c.type === "bool") {
+                let opciones = c.type === "bool" ? [[true, "Activo"], [false, "Inactivo"]] : (typeof c.options === "function" ? await c.options() : c.options);
+                const vacio = c.required || c.type === "bool" ? "" : '<option value="">— Ninguno —</option>';
+                input = `<select class="input" name="${c.name}" ${req}>${vacio}${opciones.map(([ov, ol]) =>
+                    `<option value="${esc(ov)}" ${String(ov) === String(v === "" && c.type === "bool" ? true : v) ? "selected" : ""}>${esc(ol)}</option>`).join("")}</select>`;
+            } else if (c.type === "textarea") {
+                input = `<textarea class="input" name="${c.name}" ${req}>${esc(v)}</textarea>`;
+            } else {
+                input = `<input class="input" name="${c.name}" type="${c.type || "text"}" value="${esc(v)}" ${req}
+                           ${c.step ? `step="${c.step}"` : ""} ${c.min !== undefined ? `min="${c.min}"` : ""} ${c.maxlength ? `maxlength="${c.maxlength}"` : ""}
+                           ${c.placeholder ? `placeholder="${esc(c.placeholder)}"` : ""}>`;
+            }
+            partes.push(`<div class="${c.full ? "full" : ""}"><label>${esc(c.label)}${c.required ? " *" : ""}</label>${input}</div>`);
+        }
+        return `<div class="form-grid">${partes.join("")}</div>`;
+    }
+
+    function leerFormulario(form) {
+        const datos = {};
+        form.querySelectorAll("[name]").forEach(el => {
+            if (el.type === "checkbox") { datos[el.name] = el.checked; return; }
+            let v = el.value;
+            if (v === "true") v = true; else if (v === "false") v = false;
+            datos[el.name] = v;
+        });
+        return datos;
+    }
+
+    function exportarCSV(filas, nombre) {
+        if (!filas.length) return toast("No hay datos para exportar.", "warn");
+        const cols = Object.keys(filas[0]);
+        const csv = [cols.join(";"), ...filas.map(f => cols.map(c => `"${String(f[c] ?? "").replace(/"/g, '""')}"`).join(";"))].join("\n");
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }));
+        a.download = nombre;
+        a.click();
+    }
+
+    /* Catálogos para selects (con caché) */
+    const cache = {};
+    async function opciones(recurso, valor, etiqueta, filtro = () => true) {
+        if (!cache[recurso]) cache[recurso] = await api(`/admin/${recurso}`);
+        return cache[recurso].filter(filtro).map(r => [r[valor], typeof etiqueta === "function" ? etiqueta(r) : r[etiqueta]]);
+    }
+    const limpiarCache = () => Object.keys(cache).forEach(k => delete cache[k]);
+
+    /* =====================================================================
+       Definición de mantenimientos (CRUD)
+       ===================================================================== */
+    const SERVICIOS = ["Económico", "Semicama", "Cama", "Ejecutivo", "VIP"].map(s => [s, s]);
+
+    const RECURSOS = {
+        empresas: {
+            titulo: ES_EMPRESA ? "Mi empresa" : "Empresas de transporte", singular: "empresa", pk: "id_empresa",
+            crear: ["ADMIN"], eliminar: ["ADMIN"],
+            columnas: [["razon_social", "Razón social"], ["ruc", "RUC"], ["telefono", "Teléfono"], ["correo", "Correo"], ["buses", "Buses", "num"], ["estado", "Estado", badgeBool]],
+            campos: [
+                { name: "razon_social", label: "Razón social", required: true, full: true },
+                { name: "ruc", label: "RUC", required: true, maxlength: 11, soloAdmin: true },
+                { name: "telefono", label: "Teléfono" },
+                { name: "correo", label: "Correo", type: "email" },
+                { name: "direccion", label: "Dirección" },
+                { name: "logo", label: "URL del logo", full: true },
+                { name: "estado", label: "Estado", type: "bool", soloAdmin: true }
+            ],
+            nota: ES_ADMIN ? "Desactivar una empresa bloquea el acceso de sus usuarios y oculta sus viajes en la búsqueda." : "El RUC y la activación de la empresa los gestiona BusGlow."
+        },
+        buses: {
+            titulo: "Buses", singular: "bus", pk: "id_bus",
+            columnas: [["placa", "Placa"], ["empresa", "Empresa"], ["modelo", "Modelo"], ["tipo_servicio", "Servicio"],
+                       ["capacidad", "Asientos", "num"],
+                       ["ubicacion", "Ubicación", null, (v, f) => f.en_ruta ? `<span class="badge b-Ruta">🚌 ${esc(f.en_ruta)}</span>` : (v ? `📍 ${esc(v)}` : '<span class="muted">Sin registrar</span>')],
+                       ["estado", "Estado", badgeBool]],
+            campos: [
+                { name: "id_empresa", label: "Empresa", type: "select", required: true, soloAdmin: true, options: () => opciones("empresas", "id_empresa", "razon_social") },
+                { name: "placa", label: "Placa", required: true, maxlength: 10 },
+                { name: "modelo", label: "Modelo" },
+                { name: "tipo_servicio", label: "Tipo de servicio", type: "select", required: true, options: SERVICIOS },
+                { name: "filas", label: "Filas por piso", type: "number", min: 1, default: 10, soloCrear: true },
+                { name: "por_fila", label: "Distribución", type: "select", required: true, options: [[4, "2 - 2 (4 por fila)"], [3, "2 - 1 (3 por fila, cama)"]], soloCrear: true },
+                { name: "pisos", label: "Pisos", type: "select", required: true, options: [[1, "1 piso"], [2, "2 pisos"]], soloCrear: true },
+                { name: "id_terminal_actual", label: "Ubicación actual (terminal)", type: "select", full: true, options: () => opciones("terminales", "id_terminal", t => `${t.ciudad} · ${t.nombre}`) },
+                { name: "estado", label: "Estado", type: "bool" }
+            ],
+            nota: "La ubicación se actualiza sola cuando el bus finaliza un viaje. Al programar, el bus debe salir desde la ciudad donde terminó su viaje anterior.",
+            acciones: r => `<button class="btn sm" onclick="verAsientosBus(${r.id_bus}, '${esc(r.placa)}')">💺 Asientos</button>`
+        },
+        conductores: {
+            titulo: "Conductores", singular: "conductor", pk: "id_conductor",
+            columnas: [["apellidos", "Apellidos"], ["nombres", "Nombres"], ["dni", "DNI"], ["licencia", "Licencia"], ["empresa", "Empresa"],
+                       ["situacion", "Situación", null, v => `<span class="badge b-${esc(String(v).split(" ")[0] === "En" ? "Ruta" : String(v).split(" ")[0])}">${esc(v)}</span>`],
+                       ["proximo_viaje", "Próximo viaje", null, v => v ? esc(v) : '<span class="muted">—</span>'], ["estado", "Estado", badgeBool]],
+            campos: [
+                { name: "id_empresa", label: "Empresa", type: "select", required: true, soloAdmin: true, options: () => opciones("empresas", "id_empresa", "razon_social") },
+                { name: "nombres", label: "Nombres", required: true },
+                { name: "apellidos", label: "Apellidos", required: true },
+                { name: "dni", label: "DNI", required: true, maxlength: 8 },
+                { name: "licencia", label: "N° de licencia", required: true },
+                { name: "telefono", label: "Teléfono" },
+                { name: "estado", label: "Estado", type: "bool" }
+            ],
+            nota: "Después de cada viaje el conductor debe descansar las horas configuradas en Parámetros antes de asignarle otro viaje."
+        },
+        ciudades: {
+            titulo: "Ciudades", singular: "ciudad", pk: "id_ciudad",
+            columnas: [["nombre", "Ciudad"], ["departamento", "Departamento"]],
+            campos: [{ name: "nombre", label: "Nombre", required: true }, { name: "departamento", label: "Departamento", required: true }]
+        },
+        terminales: {
+            titulo: "Terminales", singular: "terminal", pk: "id_terminal",
+            columnas: [["nombre", "Terminal"], ["ciudad", "Ciudad"], ["direccion", "Dirección"], ["estado", "Estado", badgeBool]],
+            campos: [
+                { name: "id_ciudad", label: "Ciudad", type: "select", required: true, options: () => opciones("ciudades", "id_ciudad", "nombre") },
+                { name: "nombre", label: "Nombre", required: true },
+                { name: "direccion", label: "Dirección", full: true },
+                { name: "estado", label: "Estado", type: "bool" }
+            ]
+        },
+        rutas: {
+            titulo: "Rutas", singular: "ruta", pk: "id_ruta",
+            columnas: [["origen", "Origen"], ["destino", "Destino"], ["terminal_origen_nombre", "Terminal salida"], ["distancia_km", "Km", "num"],
+                       ["duracion_estimada", "Duración"], ["estado", "Estado", badgeBool]],
+            campos: [
+                { name: "ciudad_origen", label: "Ciudad origen", type: "select", required: true, options: () => opciones("ciudades", "id_ciudad", "nombre") },
+                { name: "ciudad_destino", label: "Ciudad destino", type: "select", required: true, options: () => opciones("ciudades", "id_ciudad", "nombre") },
+                { name: "terminal_origen", label: "Terminal de salida", type: "select", options: () => opciones("terminales", "id_terminal", t => `${t.ciudad} · ${t.nombre}`) },
+                { name: "terminal_destino", label: "Terminal de llegada", type: "select", options: () => opciones("terminales", "id_terminal", t => `${t.ciudad} · ${t.nombre}`) },
+                { name: "distancia_km", label: "Distancia (km)", type: "number", step: "0.1" },
+                { name: "duracion_minutos", label: "Duración (minutos)", type: "number", required: true, min: 1 },
+                { name: "estado", label: "Estado", type: "bool" }
+            ]
+        },
+        horarios: {
+            titulo: "Horarios", singular: "horario", pk: "id_horario",
+            columnas: [["ruta", "Ruta"], ["empresa", "Empresa"], ["hora_salida", "Salida"], ["hora_llegada", "Llegada"],
+                       ["precio_base", "Precio base", "num", v => fmt.money(v)], ["estado", "Estado", badgeBool]],
+            campos: [
+                { name: "id_ruta", label: "Ruta", type: "select", required: true, options: () => opciones("rutas", "id_ruta", r => `${r.origen} → ${r.destino}`) },
+                { name: "id_empresa", label: "Empresa", type: "select", required: true, soloAdmin: true, options: () => opciones("empresas", "id_empresa", "razon_social") },
+                { name: "hora_salida", label: "Hora de salida", type: "time", required: true },
+                { name: "precio_base", label: "Precio base (S/)", type: "number", step: "0.5", required: true, min: 1 },
+                { name: "estado", label: "Estado", type: "bool" }
+            ],
+            nota: "La hora de llegada se calcula automáticamente con la duración de la ruta.",
+            acciones: r => `<button class="btn sm" onclick="generarDesdeHorario(${r.id_horario})">📅 Programar viajes</button>`
+        },
+        pasajeros: {
+            titulo: "Pasajeros", singular: "pasajero", pk: "id_pasajero", staff: true,
+            columnas: [["apellidos", "Apellidos"], ["nombres", "Nombres"], ["dni", "DNI"], ["telefono", "Teléfono"], ["viajes", "Viajes", "num"],
+                       ["id_usuario", "Cuenta", null, v => v ? "✔" : "—"]],
+            campos: [
+                { name: "nombres", label: "Nombres", required: true },
+                { name: "apellidos", label: "Apellidos", required: true },
+                { name: "dni", label: "DNI", required: true, maxlength: 8 },
+                { name: "telefono", label: "Teléfono" },
+                { name: "fecha_nacimiento", label: "Fecha de nacimiento", type: "date" }
+            ]
+        },
+        usuarios: {
+            titulo: ES_EMPRESA ? "Usuarios de mi empresa" : "Usuarios, roles y permisos", singular: "usuario", pk: "id_usuario", noDelete: true,
+            columnas: [["nombres", "Nombres"], ["apellidos", "Apellidos"], ["correo", "Correo"], ["dni", "DNI"],
+                       ["rol", "Rol", null, v => `<span class="badge b-Programado">${esc(v)}</span>`], ["empresa", "Empresa", null, v => esc(v || "—")],
+                       ["fecha_registro", "Registro"], ["estado", "Estado", badgeBool]],
+            campos: [
+                { name: "nombres", label: "Nombres", required: true },
+                { name: "apellidos", label: "Apellidos", required: true },
+                { name: "dni", label: "DNI", required: true, maxlength: 8 },
+                { name: "correo", label: "Correo", type: "email", required: true },
+                { name: "telefono", label: "Teléfono" },
+                { name: "rol", label: "Rol", type: "select", required: true, options: ES_EMPRESA
+                    ? [["VENDEDOR", "Vendedor (ventanilla)"], ["EMPRESA", "Operador de la empresa"]]
+                    : [["CLIENTE", "Cliente"], ["VENDEDOR", "Vendedor (ventanilla)"], ["EMPRESA", "Empresa de transporte"], ["ADMIN", "Administrador de BusGlow"]] },
+                { name: "id_empresa", label: "Empresa (para EMPRESA y VENDEDOR)", type: "select", soloAdmin: true, options: () => opciones("empresas", "id_empresa", "razon_social") },
+                { name: "password", label: "Contraseña", type: "password", placeholder: "Dejar vacío para no cambiarla", full: true },
+                { name: "estado", label: "Estado", type: "bool" }
+            ],
+            nota: ES_EMPRESA
+                ? "Los usuarios que crees quedan asociados a tu empresa: el operador gestiona flota y viajes; el vendedor solo vende y embarca los viajes de tu empresa."
+                : "Permisos: ADMIN = toda la plataforma · EMPRESA = su flota, conductores, horarios, viajes, vendedores y reportes · VENDEDOR = ventanilla, embarque y pasajeros (de su empresa si tiene una asignada; sin empresa, de todas) · CLIENTE = sus compras."
+        },
+        parametros: {
+            titulo: "Parámetros de operación", singular: "parámetro", pk: "clave", noDelete: true, crear: [], editar: ["ADMIN"],
+            columnas: [["clave", "Parámetro"], ["descripcion", "Descripción"], ["valor", "Valor", "num"]],
+            campos: [{ name: "valor", label: "Valor", type: "number", step: "0.5", min: 0, required: true }],
+            nota: "Se aplican de inmediato: descanso del conductor (horas), máximo de horas de conducción por conductor, margen del bus entre viajes (minutos) y % que se retiene cuando el pasajero anula su pasaje (si la empresa cancela el viaje se devuelve el 100 %)."
+        }
+    };
+
+    async function vistaCrud(clave) {
+        const def = RECURSOS[clave];
+        main.innerHTML = `
+            <div class="page-head">
+                <div><h1>${def.titulo}</h1><p>Registrar, editar y desactivar ${def.singular === "ciudad" ? "ciudades" : def.titulo.toLowerCase()}.</p></div>
+                <div class="toolbar">
+                    <input class="input search" id="buscar" placeholder="🔎 Buscar...">
+                    <button class="btn" id="csv">⬇ CSV</button>
+                    ${!def.crear || def.crear.includes(ROL) ? `<button class="btn primary" id="nuevo">+ Nuevo ${def.singular}</button>` : ""}
+                </div>
+            </div>
+            <div class="card"><div class="table-wrap" id="tabla"><div class="empty">Cargando...</div></div></div>`;
+
+        let filas = [];
+        const pintar = () => {
+            const q = $("buscar").value.toLowerCase();
+            const lista = filas.filter(f => !q || Object.values(f).some(v => String(v ?? "").toLowerCase().includes(q)));
+            $("tabla").innerHTML = lista.length ? `
+                <table>
+                    <thead><tr>${def.columnas.map(([, t, tipo]) => `<th class="${tipo === "num" ? "num" : ""}">${t}</th>`).join("")}<th></th></tr></thead>
+                    <tbody>${lista.map(f => `
+                        <tr>${def.columnas.map(([k, , tipo, render]) => {
+                            const r = typeof tipo === "function" ? tipo : render;
+                            return `<td class="${tipo === "num" ? "num" : ""}">${r ? r(f[k], f) : esc(f[k] ?? "")}</td>`;
+                        }).join("")}
+                            <td><div class="actions-cell">
+                                ${def.acciones ? def.acciones(f) : ""}
+                                ${!def.editar || def.editar.includes(ROL) ? `<button class="btn sm" onclick="editarRegistro('${clave}', '${esc(f[def.pk])}')">✏️ Editar</button>` : ""}
+                                ${def.noDelete || (def.eliminar && !def.eliminar.includes(ROL)) ? "" : `<button class="btn sm danger" onclick="eliminarRegistro('${clave}', '${esc(f[def.pk])}')">🗑</button>`}
+                            </div></td>
+                        </tr>`).join("")}
+                    </tbody>
+                </table>` : '<div class="empty">No hay registros.</div>';
+        };
+
+        try {
+            filas = await api(`/admin/${clave}`);
+            pintar();
+        } catch (err) {
+            $("tabla").innerHTML = `<div class="empty">${esc(err.message)}</div>`;
+        }
+        $("buscar").addEventListener("input", pintar);
+        $("csv").onclick = () => exportarCSV(filas, `${clave}.csv`);
+        if ($("nuevo")) $("nuevo").onclick = () => editarRegistro(clave, null);
+    }
+
+    async function editarRegistro(clave, id) {
+        const def = RECURSOS[clave];
+        let valores = {};
+        if (id) {
+            try { valores = await api(`/admin/${clave}/${encodeURIComponent(id)}`); } catch (err) { return toast(err.message, "error"); }
+        } else if (clave === "buses") {
+            valores = { por_fila: 4, pisos: 1 };
+        }
+        const html = `
+            <form id="crudForm">
+                ${await construirFormulario(def.campos, valores, !id)}
+                ${def.nota ? `<div class="form-note">${def.nota}</div>` : ""}
+                <div class="form-foot"><button type="button" class="btn" onclick="cerrarModal()">Cancelar</button><button class="btn primary">Guardar</button></div>
+            </form>`;
+        abrirModal(`${id ? "Editar" : "Nuevo"} ${def.singular}`, html);
+
+        // Sugerir distribución 2-1 para buses cama
+        const servicio = document.querySelector('#crudForm [name="tipo_servicio"]');
+        const porFila = document.querySelector('#crudForm [name="por_fila"]');
+        if (servicio && porFila) servicio.addEventListener("change", () => { porFila.value = ["Cama", "VIP"].includes(servicio.value) ? 3 : 4; });
+
+        $("crudForm").addEventListener("submit", async e => {
+            e.preventDefault();
+            const datos = leerFormulario(e.target);
+            if (clave === "usuarios" && id && !datos.password) delete datos.password;
+            try {
+                const r = await api(id ? `/admin/${clave}/${encodeURIComponent(id)}` : `/admin/${clave}`, { method: id ? "PUT" : "POST", body: datos });
+                toast(r.mensaje, "ok");
+                cerrarModal();
+                limpiarCache();
+                vistaCrud(clave);
+            } catch (err) { toast(err.message, "error", 6000); }
+        });
+    }
+
+    async function eliminarRegistro(clave, id) {
+        if (!confirm("¿Eliminar este registro? Esta acción no se puede deshacer.")) return;
+        try {
+            const r = await api(`/admin/${clave}/${encodeURIComponent(id)}`, { method: "DELETE" });
+            toast(r.mensaje, "ok");
+            limpiarCache();
+            vistaCrud(clave);
+        } catch (err) { toast(err.message, "error", 6000); }
+    }
+
+    async function verAsientosBus(id, placa) {
+        const pintar = async () => {
+            const asientos = await api(`/admin/buses/${id}/asientos`);
+            const pisos = [...new Set(asientos.map(a => a.piso))];
+            $("modalBody").innerHTML = `
+                <p class="muted" style="margin-bottom:14px">Haz clic en un asiento para marcarlo en mantenimiento (no se venderá) o disponible. ${asientos.length} asientos.</p>
+                ${pisos.map(p => `
+                    ${pisos.length > 1 ? `<h4 style="text-align:center;margin:10px 0;color:#0b2d4d">Piso ${p}</h4>` : ""}
+                    <div class="seat-map">${asientos.filter(a => a.piso === p).map(a =>
+                        `<button class="${a.estado === "Mantenimiento" ? "m" : ""}" style="grid-row:${a.fila};grid-column:${a.columna}"
+                            onclick="toggleAsiento(${a.id_asiento}, '${a.estado}')">${esc(a.numero)}</button>`).join("")}</div>`).join("")}
+                <form id="regen" style="margin-top:18px">
+                    <div class="form-note">Regenerar distribución (solo si el bus no tiene pasajes vendidos):</div>
+                    <div class="toolbar" style="margin-top:10px">
+                        <input class="input" name="filas" type="number" min="1" value="10" style="width:90px" title="Filas por piso">
+                        <select class="input" name="por_fila"><option value="4">2 - 2</option><option value="3">2 - 1</option></select>
+                        <select class="input" name="pisos"><option value="1">1 piso</option><option value="2">2 pisos</option></select>
+                        <button class="btn">Regenerar</button>
+                    </div>
+                </form>`;
+            $("regen").onsubmit = async e => {
+                e.preventDefault();
+                try {
+                    const r = await api(`/admin/buses/${id}/asientos`, { method: "POST", body: leerFormulario(e.target) });
+                    toast(r.mensaje, "ok");
+                    pintar();
+                } catch (err) { toast(err.message, "error", 6000); }
+            };
+        };
+        window.toggleAsiento = async (idAsiento, estado) => {
+            try {
+                await api(`/admin/asientos/${idAsiento}`, { method: "PATCH", body: { estado: estado === "Mantenimiento" ? "Disponible" : "Mantenimiento" } });
+                pintar();
+            } catch (err) { toast(err.message, "error"); }
+        };
+        abrirModal(`Distribución de asientos · ${placa}`, '<div class="empty">Cargando...</div>');
+        try { await pintar(); } catch (err) { $("modalBody").innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
+    }
+
+    /* =====================================================================
+       Dashboard + alertas
+       ===================================================================== */
+    async function vistaDashboard() {
+        main.innerHTML = `
+            <div class="page-head">
+                <div><h1>Panel de operaciones</h1><p>${fmt.fechaLarga(fmt.hoy())} · se actualiza cada minuto</p></div>
+                <div class="toolbar"><button class="btn" onclick="vistaDashboard()">↻ Actualizar</button></div>
+            </div>
+            <div class="kpis" id="kpis"></div>
+            <div class="card"><h2>🔔 Alertas <small id="alertasHora"></small></h2><div id="alertas"><div class="empty">Cargando...</div></div></div>
+            <div class="card"><h2>Salidas de hoy <button class="btn sm" onclick="navegar('programacion')">Ver programación →</button></h2><div class="table-wrap" id="hoy"></div></div>`;
+
+        try {
+            const [k, a, p] = await Promise.all([api("/admin/dashboard"), api("/admin/alertas"), api(`/admin/viajes?fecha=${fmt.hoy()}`)]);
+            $("kpis").innerHTML = [
+                ["Viajes hoy", k.viajes_hoy], ["Retrasados hoy", k.retrasados_hoy], ["Boletos vendidos hoy", k.boletos_vendidos_hoy],
+                ["Ingresos netos de hoy", fmt.money(k.ventas_hoy)], ["Reembolsos pendientes", k.reembolsos_pendientes], ["Buses en ruta", k.en_ruta], ["Buses activos", k.buses_activos], ["Conductores activos", k.conductores_activos]
+            ].map(([t, v]) => `<div class="kpi"><span>${t}</span><strong>${v}</strong></div>`).join("");
+
+            $("alertasHora").textContent = `Actualizado ${new Date().toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}`;
+            const TIPOS = { RETRASO: ["⚠️", "Retraso"], PROXIMA_SALIDA: ["⏰", "Próxima salida"], TRIPULACION: ["🧑‍✈️", "Tripulación incompleta"] };
+            $("alertas").innerHTML = a.alertas.length ? a.alertas.map(al => `
+                <div class="alert ${al.nivel}">
+                    <span class="ico">${TIPOS[al.tipo][0]}</span>
+                    <div><b>${TIPOS[al.tipo][1]}</b> · ${esc(al.mensaje)}</div>
+                    ${al.tipo === "TRIPULACION"
+                        ? (PUEDE_PROGRAMAR ? `<button class="btn sm" onclick="reprogramar(${al.viaje.id_viaje})">Asignar conductores</button>` : "")
+                        : `<button class="btn sm" onclick="cambiarEstado(${al.viaje.id_viaje})">Actualizar estado</button>`}
+                </div>`).join("") : '<div class="empty">✅ Sin alertas: no hay retrasos, salidas en los próximos 60 minutos ni viajes sin tripulación.</div>';
+
+            $("hoy").innerHTML = tablaViajes(p.viajes, true);
+        } catch (err) { toast(err.message, "error"); }
+
+        clearInterval(refresco);
+        refresco = setInterval(() => { if (vistaActual === "dashboard") vistaDashboard(); }, 60000);
+    }
+
+    /* =====================================================================
+       Programación de viajes
+       ===================================================================== */
+    let fechaProg = fmt.hoy();
+
+    function tablaViajes(viajes, compacta = false) {
+        if (!viajes.length) return '<div class="empty">No hay viajes programados para esta fecha.</div>';
+        return `<table>
+            <thead><tr><th>Salida</th><th>Ruta</th><th>Empresa · Bus</th>${compacta ? "" : "<th>Conductor</th>"}<th>Estado</th><th class="num">Retraso</th><th>Ocupación</th><th></th></tr></thead>
+            <tbody>${viajes.map(v => {
+                const ocupados = v.capacidad - v.asientos_disponibles;
+                const pct = v.capacidad ? 100 * ocupados / v.capacidad : 0;
+                return `<tr>
+                    <td><b>${v.hora_salida}</b><div class="muted">llega ${v.hora_llegada}${v.fecha_llegada !== v.fecha_salida ? " (+1)" : ""}</div></td>
+                    <td>${esc(v.origen)} → ${esc(v.destino)}<div class="muted">${esc(v.terminal_origen || "")}</div></td>
+                    <td>${esc(v.empresa)}<div class="muted">${esc(v.placa)} · ${esc(v.tipo_servicio)}</div></td>
+                    ${compacta ? "" : `<td>${v.conductor ? esc(v.conductor) : '<span class="late">Sin asignar</span>'}${v.num_conductores > 1 ? `<div class="muted">+ ${v.num_conductores - 1} relevo(s)</div>` : ""}</td>`}
+                    <td>${badgeEstado(v.estado)}</td>
+                    <td class="num ${v.retraso_min > 5 ? "late" : ""}">${v.retraso_min > 0 ? v.retraso_min + " min" : "—"}</td>
+                    <td>${barra(pct, `${ocupados}/${v.capacidad}`)}</td>
+                    <td><div class="actions-cell">
+                        <button class="btn sm" onclick="verViaje(${v.id_viaje})">Ver</button>
+                        ${["Finalizado", "Cancelado"].includes(v.estado) ? "" : `<button class="btn sm" onclick="cambiarEstado(${v.id_viaje})">Estado</button>`}
+                        ${PUEDE_PROGRAMAR && !["Salido", "Finalizado", "Cancelado"].includes(v.estado) ? `<button class="btn sm" onclick="reprogramar(${v.id_viaje})">Reprogramar</button>` : ""}
+                    </div></td>
+                </tr>`;
+            }).join("")}</tbody></table>`;
+    }
+
+    async function vistaProgramacion() {
+        main.innerHTML = `
+            <div class="page-head">
+                <div><h1>Programación diaria de viajes</h1><p>Salidas, estados, retrasos y ocupación.</p></div>
+                <div class="toolbar">
+                    <button class="btn" id="prev">◀</button>
+                    <input type="date" class="input" id="fechaProg" value="${fechaProg}">
+                    <button class="btn" id="next">▶</button>
+                    <select class="input" id="estadoProg"><option value="">Todos los estados</option>${ESTADOS.map(e => `<option>${e}</option>`).join("")}</select>
+                    ${PUEDE_PROGRAMAR ? '<button class="btn primary" onclick="nuevoViaje()">+ Programar viaje</button>' : ""}
+                </div>
+            </div>
+            <div class="kpis" id="resumenProg"></div>
+            <div class="card"><div class="table-wrap" id="tablaProg"><div class="empty">Cargando...</div></div></div>`;
+
+        const cargar = async () => {
+            fechaProg = $("fechaProg").value || fmt.hoy();
+            const estado = $("estadoProg").value;
+            try {
+                const r = await api(`/admin/viajes?fecha=${fechaProg}${estado ? `&estado=${encodeURIComponent(estado)}` : ""}`);
+                const vendidos = r.viajes.reduce((s, v) => s + (v.capacidad - v.asientos_disponibles), 0);
+                const capacidad = r.viajes.reduce((s, v) => s + v.capacidad, 0);
+                $("resumenProg").innerHTML = [
+                    ["Viajes", r.viajes.length],
+                    ["Con retraso", r.viajes.filter(v => v.retraso_min > 5).length],
+                    ["Cancelados", r.viajes.filter(v => v.estado === "Cancelado").length],
+                    ["Ocupación", capacidad ? `${(100 * vendidos / capacidad).toFixed(1)} %` : "—"]
+                ].map(([t, v]) => `<div class="kpi"><span>${t}</span><strong>${v}</strong></div>`).join("");
+                $("tablaProg").innerHTML = tablaViajes(r.viajes);
+            } catch (err) { $("tablaProg").innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
+        };
+        $("fechaProg").onchange = cargar;
+        $("estadoProg").onchange = cargar;
+        $("prev").onclick = () => { $("fechaProg").value = fmt.sumarDias($("fechaProg").value, -1); cargar(); };
+        $("next").onclick = () => { $("fechaProg").value = fmt.sumarDias($("fechaProg").value, 1); cargar(); };
+        window.recargarProgramacion = cargar;
+        cargar();
+    }
+
+    function recargarVista() {
+        if (vistaActual === "programacion" && window.recargarProgramacion) window.recargarProgramacion();
+        else navegar(vistaActual);
+    }
+
+    async function verViaje(id) {
+        abrirModal("Detalle del viaje", '<div class="empty">Cargando...</div>', true);
+        try {
+            const v = await api(`/admin/viajes/${id}`);
+            $("modalTitle").textContent = `Viaje #${v.id_viaje} · ${v.origen} → ${v.destino}`;
+            $("modalBody").innerHTML = `
+                <div class="detail-grid">
+                    <div><small>Salida programada</small><b>${fmt.fecha(v.fecha_salida)} ${v.hora_salida}</b></div>
+                    <div><small>Llegada estimada</small><b>${fmt.fecha(v.fecha_llegada)} ${v.hora_llegada}</b></div>
+                    <div><small>Estado</small>${badgeEstado(v.estado)}</div>
+                    <div><small>Inicio de embarque</small><b>${v.hora_real_embarque || "—"}</b></div>
+                    <div><small>Salida real</small><b>${v.hora_real_salida || "—"}</b></div>
+                    <div><small>Llegada real</small><b>${v.hora_real_llegada || "—"}</b></div>
+                    <div><small>Retraso en la salida</small><b class="${v.retraso_min > 5 ? "late" : ""}">${v.retraso_min > 0 ? v.retraso_min + " min" : "Sin retraso"}</b></div>
+                    <div><small>Empresa / bus</small><b>${esc(v.empresa)} · ${esc(v.placa)}</b></div>
+                    <div><small>Precio</small><b>${fmt.money(v.precio)}</b>${v.traslado_vacio ? '<div class="muted">Con traslado en vacío</div>' : ""}</div>
+                </div>
+                <h4 style="color:#0b2d4d;margin:8px 0">Tripulación (${v.conductores.length} de ${v.conductores_requeridos} requeridos)</h4>
+                <div class="table-wrap">${v.conductores.length ? `<table><thead><tr><th>Rol</th><th>Conductor</th><th>DNI</th><th>Licencia</th><th>Teléfono</th></tr></thead><tbody>
+                    ${v.conductores.map(c => `<tr><td><span class="badge ${c.rol === "TITULAR" ? "b-Programado" : "b-Finalizado"}">${esc(c.rol)}</span></td>
+                        <td>${esc(c.nombres)} ${esc(c.apellidos)}</td><td>${esc(c.dni)}</td><td>${esc(c.licencia)}</td><td>${esc(c.telefono || "—")}</td></tr>`).join("")}
+                    </tbody></table>` : '<div class="empty">Sin conductores asignados.</div>'}</div>
+                ${v.estado === "Cancelado" ? `<h4 style="color:#0b2d4d;margin:18px 0 8px">Pasajeros afectados por la cancelación</h4>
+                    <div class="table-wrap" id="afectados"><div class="empty">Cargando...</div></div>` : ""}
+                <h4 style="color:#0b2d4d;margin:18px 0 8px">Manifiesto de pasajeros (${v.pasajeros.length})</h4>
+                <div class="table-wrap">${v.pasajeros.length ? `<table><thead><tr><th>Asiento</th><th>Pasajero</th><th>DNI</th><th>Reserva</th><th>Boleto</th></tr></thead><tbody>
+                    ${v.pasajeros.map(p => `<tr><td><b>${esc(p.asiento)}</b></td><td>${esc(p.nombres)} ${esc(p.apellidos)}</td><td>${esc(p.dni)}</td>
+                        <td>${esc(p.estado_reserva)}</td><td>${esc(p.codigo_boleto || "—")} <span class="muted">${esc(p.estado_boleto || "")}</span></td></tr>`).join("")}
+                    </tbody></table>` : '<div class="empty">Sin pasajeros.</div>'}</div>
+                <h4 style="color:#0b2d4d;margin:18px 0 8px">Historial de modificaciones</h4>
+                ${v.modificaciones.length ? `<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Cambio</th><th>Motivo</th><th>Usuario</th></tr></thead><tbody>
+                    ${v.modificaciones.map(m => `<tr><td>${esc(m.fecha)}</td><td>${esc(m.tipo)}</td><td>${esc(m.valor_anterior || "")} → ${esc(m.valor_nuevo || "")}</td>
+                        <td>${esc(m.motivo)}</td><td>${esc(m.usuario || "")}</td></tr>`).join("")}</tbody></table>` : '<div class="empty">Sin modificaciones.</div>'}
+                <div class="form-foot"><button class="btn" onclick="window.print()">🖨️ Imprimir</button></div>`;
+            if (v.estado === "Cancelado") pintarAfectados(id);
+        } catch (err) { $("modalBody").innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
+    }
+
+    /* =====================================================================
+       Posventa: reembolsos y reubicación de pasajeros de viajes cancelados
+       ===================================================================== */
+    const badgeReembolso = (estado, monto, codigo) => {
+        if (!estado) return '<span class="muted">Sin pago</span>';
+        const cls = { Pendiente: "b-Retrasado", Procesado: "b-Finalizado", Anulado: "b-Programado" }[estado] || "";
+        const txt = { Pendiente: "Reembolso pendiente", Procesado: "Reembolsado", Anulado: "No aplica (reubicado)" }[estado] || estado;
+        return `<span class="badge ${cls}">${txt}</span>${monto != null && estado !== "Anulado" ? ` <b>${fmt.money(monto)}</b>` : ""}${codigo ? `<div class="muted">${esc(codigo)}</div>` : ""}`;
+    };
+
+    const accionesPosventa = r => r.estado_reembolso === "Pendiente" ? `
+        <button class="btn sm" onclick="reubicarReserva(${r.id_reserva})">🔁 Cambiar de viaje</button>
+        <button class="btn sm" onclick="reembolsarReserva(${r.id_reserva})">💸 Reembolsar</button>` : "";
+
+    async function pintarAfectados(idViaje) {
+        try {
+            const lista = await api(`/admin/viajes/${idViaje}/afectados`);
+            $("afectados").innerHTML = lista.length ? `<table><thead><tr><th>Reserva</th><th>Pasajeros (asiento)</th><th>Comprador</th><th>Situación</th><th></th></tr></thead><tbody>
+                ${lista.map(r => `<tr>
+                    <td><b>#${r.id_reserva}</b><div class="muted">${fmt.money(r.total)}</div></td>
+                    <td>${esc(r.pasajeros || "")}</td>
+                    <td>${esc(r.comprador)}<div class="muted">${r.rol_comprador === "CLIENTE" ? esc(r.correo) : "Venta en ventanilla (aviso por SMS)"}</div></td>
+                    <td>${r.reubicada_en ? `<span class="badge b-Programado">Reubicado</span><div class="muted">Reserva #${r.reubicada_en} · ${esc(r.nuevo_viaje)}</div>` : badgeReembolso(r.estado_reembolso, r.monto_reembolso, r.codigo_reembolso)}</td>
+                    <td><div class="actions-cell">${accionesPosventa(r)}</div></td></tr>`).join("")}</tbody></table>
+                <div class="form-note">Cada pasajero recibió un aviso y elige: devolución del 100 % o cambio sin costo a otro viaje de la misma ruta y empresa.</div>`
+                : '<div class="empty">El viaje no tenía pasajes pagados.</div>';
+        } catch (err) { $("afectados").innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
+    }
+
+    async function reembolsarReserva(idReserva) {
+        if (!confirm("Se devolverá el 100 % del pago al pasajero y se le avisará. ¿Continuar?")) return;
+        try {
+            const r = await api(`/admin/reservas/${idReserva}/reembolsar`, { method: "POST" });
+            toast(r.mensaje, "ok", 7000);
+            cerrarModal();
+            recargarVista();
+        } catch (err) { toast(err.message, "error", 7000); }
+    }
+
+    async function reubicarReserva(idReserva) {
+        abrirModal("Cambiar de viaje", '<div class="empty">Buscando viajes disponibles...</div>', true);
+        try {
+            const d = await api(`/admin/reservas/${idReserva}/alternativas`);
+            const r = d.reserva;
+            $("modalTitle").textContent = `Cambiar de viaje · reserva #${r.id_reserva}`;
+            $("modalBody").innerHTML = `
+                <p class="muted" style="margin-bottom:12px">${esc(r.origen)} → ${esc(r.destino)} · ${esc(r.empresa)} · viaje cancelado del ${fmt.fecha(r.fecha_salida)} ${r.hora_salida}<br>
+                    Pasajeros: <b>${esc(r.pasajeros)}</b></p>
+                ${d.viajes.length ? `<form id="reubForm"><table><thead><tr><th></th><th>Salida</th><th>Llega</th><th>Bus</th><th>Estado</th><th class="num">Asientos libres</th></tr></thead><tbody>
+                    ${d.viajes.map((v, i) => `<tr>
+                        <td><input type="radio" name="id_viaje" value="${v.id_viaje}" ${i === 0 ? "checked" : ""}></td>
+                        <td><b>${fmt.fecha(v.fecha_salida)} ${v.hora_salida}</b></td><td>${v.hora_llegada}</td>
+                        <td>${esc(v.placa)} · ${esc(v.tipo_servicio)}</td><td>${badgeEstado(v.estado)}</td><td class="num">${v.libres}</td></tr>`).join("")}
+                    </tbody></table>
+                    <div class="form-note">El cambio es sin costo para el pasajero (se respeta lo que pagó). Se intenta mantener el mismo número de asiento; si está ocupado, se asigna el primero libre. Se emiten boletos nuevos y se le avisa.</div>
+                    <div class="form-foot"><button type="button" class="btn" onclick="cerrarModal()">Cancelar</button><button class="btn primary">Confirmar cambio</button></div></form>`
+                : '<div class="empty">No hay viajes próximos de la misma ruta y empresa con asientos suficientes. Ofrece el reembolso.</div>'}`;
+            if ($("reubForm")) $("reubForm").onsubmit = async e => {
+                e.preventDefault();
+                const sel = e.target.querySelector('[name="id_viaje"]:checked');
+                try {
+                    const res = await api(`/admin/reservas/${idReserva}/reubicar`, { method: "POST", body: { id_viaje: sel.value } });
+                    toast(res.mensaje, "ok", 8000);
+                    cerrarModal();
+                    recargarVista();
+                } catch (err) { toast(err.message, "error", 7000); }
+            };
+        } catch (err) { $("modalBody").innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
+    }
+
+    async function vistaReembolsos() {
+        main.innerHTML = `
+            <div class="page-head">
+                <div><h1>Reembolsos</h1><p>Devoluciones de pasajes anulados y de viajes cancelados por la empresa.</p></div>
+                <div class="toolbar">
+                    <select class="input" id="estadoRb">
+                        <option value="Pendiente">Pendientes</option><option value="Procesado">Procesados</option>
+                        <option value="Anulado">Reubicados (no aplica)</option><option value="">Todos</option>
+                    </select>
+                    <button class="btn" id="csvRb">⬇ CSV</button>
+                </div>
+            </div>
+            <div class="card"><div class="table-wrap" id="tablaRb"><div class="empty">Cargando...</div></div></div>`;
+        let filas = [];
+        const cargar = async () => {
+            try {
+                filas = await api(`/admin/reembolsos${$("estadoRb").value ? `?estado=${$("estadoRb").value}` : ""}`);
+                $("tablaRb").innerHTML = filas.length ? `<table><thead><tr><th>Reserva</th><th>Viaje</th><th>Comprador</th><th>Motivo</th>
+                        <th class="num">Pagado</th><th class="num">Retención</th><th>Devolución</th><th>Fechas</th><th></th></tr></thead><tbody>
+                    ${filas.map(r => `<tr>
+                        <td><b>#${r.id_reserva}</b><div class="muted">${esc(r.metodo_pago || "")}</div></td>
+                        <td>${esc(r.ruta)}<div class="muted">${esc(r.salida)} · ${esc(r.empresa)}</div></td>
+                        <td>${esc(r.comprador)}</td>
+                        <td>${r.motivo_cancelacion === "VIAJE" ? '<span class="badge b-Cancelado">Viaje cancelado</span>' : '<span class="badge b-Finalizado">Anulado por el pasajero</span>'}
+                            <div class="muted">${esc(r.motivo)}</div></td>
+                        <td class="num">${fmt.money(r.monto_pagado)}</td><td class="num">${r.penalidad ? fmt.money(r.penalidad) : "—"}</td>
+                        <td>${badgeReembolso(r.estado, r.monto, r.codigo)}</td>
+                        <td class="muted">Solicitado ${esc(r.fecha_solicitud)}${r.fecha_proceso ? `<br>Atendido ${esc(r.fecha_proceso)}` : ""}</td>
+                        <td><div class="actions-cell">${accionesPosventa({ ...r, estado_reembolso: r.estado })}</div></td></tr>`).join("")}</tbody></table>`
+                    : '<div class="empty">No hay reembolsos en este estado.</div>';
+            } catch (err) { $("tablaRb").innerHTML = `<div class="empty">${esc(err.message)}</div>`; }
+        };
+        $("estadoRb").onchange = cargar;
+        $("csvRb").onclick = () => exportarCSV(filas, "reembolsos.csv");
+        cargar();
+    }
+
+    async function cambiarEstado(id) {
+        let v;
+        try { v = await api(`/admin/viajes/${id}`); } catch (err) { return toast(err.message, "error"); }
+        const estados = ESTADOS.filter(e => e !== v.estado && (PUEDE_PROGRAMAR || e !== "Cancelado"));
+        abrirModal(`Estado del viaje · ${v.origen} → ${v.destino} ${v.hora_salida}`, `
+            <form id="estadoForm">
+                <div class="form-grid">
+                    <div><label>Estado actual</label><div style="padding-top:10px">${badgeEstado(v.estado)}</div></div>
+                    <div><label>Nuevo estado *</label><select class="input" name="estado">${estados.map(e => `<option>${e}</option>`).join("")}</select></div>
+                    <div><label>Hora real (opcional)</label><input class="input" type="time" name="hora"></div>
+                    <div><label>Hora programada</label><div style="padding-top:10px"><b>${v.hora_salida}</b></div></div>
+                    <div class="full"><label>Motivo / observación</label><textarea class="input" name="motivo" placeholder="Obligatorio para Retrasado y Cancelado"></textarea></div>
+                </div>
+                <div class="form-note">Al pasar a <b>Embarcando</b> se registra la hora real de inicio de embarque; al pasar a <b>Salido</b>, la hora real de salida (y se calcula el retraso); al pasar a <b>Finalizado</b>, la hora real de llegada: desde ahí corre el descanso de los conductores y el bus queda ubicado en el terminal de destino. Si no indicas hora se usa la hora actual. No se puede embarcar sin la tripulación completa. Cancelar un viaje anula sus boletos.</div>
+                <div class="form-foot"><button type="button" class="btn" onclick="cerrarModal()">Cancelar</button><button class="btn primary">Guardar estado</button></div>
+            </form>`);
+        $("estadoForm").onsubmit = async e => {
+            e.preventDefault();
+            const d = leerFormulario(e.target);
+            if (d.estado === "Cancelado" && !confirm("Se anularán todos los boletos del viaje. Los pasajeros con pasaje pagado recibirán un aviso y podrán elegir devolución del 100 % o cambio de viaje sin costo. ¿Continuar?")) return;
+            try {
+                const r = await api(`/admin/viajes/${id}/estado`, { method: "PATCH", body: { estado: d.estado, motivo: d.motivo || undefined, hora: d.hora || undefined } });
+                toast(r.mensaje, "ok");
+                cerrarModal();
+                recargarVista();
+            } catch (err) { toast(err.message, "error", 6000); }
+        };
+    }
+
+    /* ---------- Formulario de programación con disponibilidad en vivo ---------- */
+
+    /** Opciones de un select de recursos: los no disponibles aparecen deshabilitados con su motivo. */
+    function opcionesRecurso(lista, idKey, etiqueta, seleccionado, vacio) {
+        const ordenada = [...lista].sort((a, b) => (b.disponible - a.disponible));
+        return (vacio ? `<option value="">${vacio}</option>` : "") + ordenada.map(r => {
+            const sel = String(r[idKey]) === String(seleccionado ?? "");
+            // el recurso ya asignado se deja elegible para no perderlo al editar
+            const ok = r.disponible || sel;
+            return `<option value="${r[idKey]}" ${sel ? "selected" : ""} ${ok ? "" : "disabled"}>${ok ? "✔ " : "✖ "}${esc(etiqueta(r))}</option>`;
+        }).join("");
+    }
+
+    /**
+     * Formulario de viaje (nuevo o reprogramación). Al cambiar ruta, fecha u hora consulta
+     * /admin/viajes/disponibilidad y muestra solo los buses que estarán en la ciudad de origen
+     * y los conductores que ya cumplieron su descanso.
+     */
+    async function formularioViaje({ viaje = null } = {}) {
+        const rutas = await opciones("rutas", "id_ruta", r => `${r.origen} → ${r.destino} (${r.duracion_estimada})`, r => r.estado);
+        const actuales = viaje ? viaje.conductores.map(c => c.id_conductor) : [];
+        abrirModal(viaje ? `Reprogramar · ${viaje.origen} → ${viaje.destino}` : "Programar viaje", `
+            <form id="viajeForm">
+                <div class="form-grid">
+                    <div class="full"><label>Ruta *</label>
+                        <select class="input" name="id_ruta" required ${viaje ? "disabled" : ""}>
+                            <option value="">— Elige la ruta —</option>${rutas.map(([v, l]) => `<option value="${v}" ${viaje && v === viaje.id_ruta ? "selected" : ""}>${esc(l)}</option>`).join("")}
+                        </select></div>
+                    <div><label>Fecha de salida *</label><input class="input" type="date" name="fecha_salida" required value="${viaje ? viaje.fecha_salida : fechaProg}"></div>
+                    <div><label>Hora de salida *</label><input class="input" type="time" name="hora_salida" required value="${viaje ? viaje.hora_salida : ""}"></div>
+                    ${viaje ? "" : `<div><label>Precio (S/) *</label><input class="input" type="number" name="precio" step="0.5" min="1" required></div><div></div>`}
+                    <div class="full"><label>Bus *</label><select class="input" name="id_bus" required><option value="">Elige ruta, fecha y hora</option></select></div>
+                    <div><label>Conductor titular</label><select class="input" name="id_conductor"></select></div>
+                    <div><label>Relevo 1</label><select class="input" name="id_relevo"></select></div>
+                    <div><label>Relevo 2</label><select class="input" name="id_relevo2"></select></div>
+                    <div></div>
+                    <div class="full"><label class="check"><input type="checkbox" name="traslado_vacio" ${viaje && viaje.traslado_vacio ? "checked" : ""}>
+                        <span>Autorizar <b>traslado en vacío</b>: el bus se moverá sin pasajeros hasta la ciudad de origen (permite elegir un bus que está en otra ciudad).</span></label></div>
+                    ${viaje ? `<div class="full"><label>Motivo de la reprogramación *</label>
+                        <textarea class="input" name="motivo" required placeholder="Ej.: cierre de vía por huaico, cambio de unidad por mantenimiento..."></textarea></div>` : ""}
+                </div>
+                <div class="disp" id="disp">Elige la ruta, la fecha y la hora para ver los buses y conductores disponibles.</div>
+                <div class="form-note">${viaje ? "El motivo queda registrado en el historial del viaje. Si cambias de bus, los asientos vendidos se reasignan a los mismos números." :
+                    "La llegada se calcula con la duración de la ruta. Puedes programar sin conductores y asignarlos después, pero el viaje no podrá embarcar hasta tener la tripulación completa."}</div>
+                <div class="form-foot"><button type="button" class="btn" onclick="cerrarModal()">Cancelar</button><button class="btn primary">${viaje ? "Reprogramar" : "Programar"}</button></div>
+            </form>`, true);
+
+        const f = $("viajeForm");
+        const campo = n => f.querySelector(`[name="${n}"]`);
+        let consulta = 0, primera = true;
+
+        const actualizar = async () => {
+            const id_ruta = campo("id_ruta").value, fecha = campo("fecha_salida").value, hora = campo("hora_salida").value;
+            if (!id_ruta || !fecha || !hora) return;
+            const n = ++consulta;
+            // En la primera consulta se preseleccionan el bus y la tripulación actuales del viaje
+            const elegidos = primera
+                ? { bus: viaje && viaje.id_bus, c: actuales }
+                : { bus: campo("id_bus").value, c: [campo("id_conductor").value, campo("id_relevo").value, campo("id_relevo2").value] };
+            primera = false;
+            $("disp").innerHTML = "Consultando disponibilidad...";
+            try {
+                const q = new URLSearchParams({ id_ruta, fecha_salida: fecha, hora_salida: hora, traslado_vacio: campo("traslado_vacio").checked });
+                if (viaje) q.set("excluir", viaje.id_viaje);
+                const d = await api(`/admin/viajes/disponibilidad?${q}`);
+                if (n !== consulta) return;   // llegó una respuesta más reciente
+                window.__disp = d;
+                campo("id_bus").innerHTML = opcionesRecurso(d.buses, "id_bus",
+                    b => `${b.placa} · ${b.empresa} · ${b.tipo_servicio} (${b.capacidad})${b.ubicacion ? " · en " + b.ubicacion : ""}${b.motivo ? " — " + b.motivo : ""}`,
+                    elegidos.bus, "— Elige el bus —");
+                const etiquetaC = c => `${c.nombre} · ${c.empresa}${c.motivo ? " — " + c.motivo : ""}`;
+                ["id_conductor", "id_relevo", "id_relevo2"].forEach((name, i) => {
+                    campo(name).innerHTML = opcionesRecurso(d.conductores, "id_conductor", etiquetaC, elegidos.c[i], i === 0 ? "— Sin asignar —" : "— Ninguno —");
+                });
+                const nb = d.buses.filter(b => b.disponible).length, nc = d.conductores.filter(c => c.disponible).length;
+                $("disp").innerHTML = `
+                    <b>${esc(d.ruta)}</b> · sale ${esc(d.salida.replace("T", " ").slice(0, 16))} · llega ${esc(d.llegada.replace("T", " ").slice(0, 16))}<br>
+                    Requiere <b>${d.conductores_requeridos} conductor(es)</b> (máx. ${d.parametros.max_horas_conduccion} h de conducción cada uno) ·
+                    descanso mínimo ${d.parametros.horas_descanso_conductor} h · margen del bus ${d.parametros.margen_bus_minutos} min<br>
+                    <b>${nb}</b> bus(es) y <b>${nc}</b> conductor(es) disponibles (✔). Los marcados con ✖ indican el motivo.
+                    <div class="motivo" id="motivoBus"></div>`;
+                mostrarMotivoBus();
+            } catch (err) { $("disp").innerHTML = `<span class="late">${esc(err.message)}</span>`; }
+        };
+        const mostrarMotivoBus = () => {
+            const d = window.__disp; if (!d) return;
+            const b = d.buses.find(x => String(x.id_bus) === campo("id_bus").value);
+            $("motivoBus").textContent = b && b.motivo ? `Bus elegido: ${b.motivo}` : "";
+        };
+        ["id_ruta", "fecha_salida", "hora_salida", "traslado_vacio"].forEach(n => campo(n).addEventListener("change", actualizar));
+        campo("id_bus").addEventListener("change", mostrarMotivoBus);
+        if (viaje) actualizar();
+
+        f.onsubmit = async e => {
+            e.preventDefault();
+            const datos = leerFormulario(f);
+            datos.conductores = [datos.id_conductor, datos.id_relevo, datos.id_relevo2].filter(Boolean);
+            delete datos.id_conductor; delete datos.id_relevo; delete datos.id_relevo2;
+            try {
+                const r = viaje
+                    ? await api(`/admin/viajes/${viaje.id_viaje}/reprogramar`, { method: "PUT", body: datos })
+                    : await api("/admin/viajes", { method: "POST", body: { ...datos, id_ruta: campo("id_ruta").value } });
+                toast(r.mensaje, "ok", 6000);
+                cerrarModal();
+                recargarVista();
+            } catch (err) { toast(err.message, "error", 9000); }
+        };
+    }
+
+    function nuevoViaje() { formularioViaje(); }
+
+    async function reprogramar(id) {
+        let v;
+        try { v = await api(`/admin/viajes/${id}`); } catch (err) { return toast(err.message, "error"); }
+        formularioViaje({ viaje: v });
+    }
+
+    async function generarDesdeHorario(idHorario) {
+        const manana = fmt.sumarDias(fmt.hoy(), 1);
+        const horarios = cache.horarios || await api("/admin/horarios");
+        const h = horarios.find(x => x.id_horario === idHorario);
+        const [origen, destino] = h ? h.ruta.split(" → ") : ["", ""];
+        // horarios de vuelta: misma empresa y ruta inversa
+        const vueltas = horarios.filter(x => h && x.id_empresa === h.id_empresa && x.ruta === `${destino} → ${origen}` && x.estado)
+            .map(x => [x.id_horario, `${x.ruta} · ${x.hora_salida}`]);
+        const conductor = c => `${c.apellidos}, ${c.nombres} · ${c.situacion}`;
+        const deEmpresa = c => c.estado && (!h || c.id_empresa === h.id_empresa);
+        abrirModal(`Programar viajes · ${h ? `${h.ruta} ${h.hora_salida}` : "horario"}`, `
+            <form id="genForm">
+                ${await construirFormulario([
+                    { name: "id_bus", label: "Bus", type: "select", required: true, full: true,
+                      options: () => opciones("buses", "id_bus", b => `${b.placa} · ${b.tipo_servicio} · ${b.en_ruta || (b.ubicacion ? "en " + b.ubicacion : "sin ubicación")}`, b => b.estado && (!h || b.id_empresa === h.id_empresa)) },
+                    { name: "id_horario_vuelta", label: "Horario de vuelta (opcional)", type: "select", options: vueltas, full: true },
+                    { name: "id_conductor", label: "Conductor titular", type: "select", options: () => opciones("conductores", "id_conductor", conductor, deEmpresa) },
+                    { name: "id_relevo", label: "Relevo 1", type: "select", options: () => opciones("conductores", "id_conductor", conductor, deEmpresa) },
+                    { name: "id_relevo2", label: "Relevo 2", type: "select", options: () => opciones("conductores", "id_conductor", conductor, deEmpresa) },
+                    { name: "precio", label: "Precio (vacío = precio base)", type: "number", step: "0.5" },
+                    { name: "desde", label: "Desde", type: "date", required: true, default: manana },
+                    { name: "hasta", label: "Hasta", type: "date", required: true, default: fmt.sumarDias(manana, 6) },
+                    { name: "traslado_vacio", label: "Autorizar traslado en vacío para la primera salida (si el bus está en otra ciudad)", type: "check" }
+                ])}
+                <div class="form-note">Se intenta un viaje por día (máx. 92). Con <b>horario de vuelta</b>, el mismo bus regresa en la primera salida posible después de llegar, y la ida siguiente se programa cuando el bus ya volvió.
+                    Los días en que el bus no esté en la ciudad de origen, se cruce con otro viaje o los conductores no hayan descansado se omiten y se informa el motivo.</div>
+                <div class="form-foot"><button type="button" class="btn" onclick="cerrarModal()">Cancelar</button><button class="btn primary">Generar</button></div>
+            </form>`);
+        $("genForm").onsubmit = async e => {
+            e.preventDefault();
+            try {
+                const r = await api("/admin/viajes/generar", { method: "POST", body: { id_horario: idHorario, ...leerFormulario(e.target) } });
+                $("modalBody").innerHTML = `<p style="margin-bottom:12px"><b>${esc(r.mensaje)}</b></p>
+                    ${r.creados.length ? `<table><thead><tr><th>Programado</th><th>Ruta</th><th>Viaje</th></tr></thead><tbody>
+                        ${r.creados.map(o => `<tr><td>${o.fecha} ${o.hora}</td><td>${esc(o.ruta)}</td><td>#${o.id_viaje}</td></tr>`).join("")}</tbody></table>` : ""}
+                    ${r.omitidos.length ? `<table style="margin-top:12px"><thead><tr><th>Omitido</th><th>Motivo</th></tr></thead><tbody>
+                        ${r.omitidos.map(o => `<tr><td>${o.fecha} ${o.hora}</td><td>${esc(o.motivo)}</td></tr>`).join("")}</tbody></table>` : ""}
+                    <div class="form-foot"><button class="btn primary" onclick="cerrarModal()">Aceptar</button></div>`;
+            } catch (err) { toast(err.message, "error", 7000); }
+        };
+    }
+
+    /* =====================================================================
+       Verificación de boletos
+       ===================================================================== */
+    function vistaBoletos() {
+        main.innerHTML = `
+            <div class="page-head"><div><h1>Verificar boleto</h1><p>Consulta la validez de un boleto por su código (ej. BG-XXXXXXXX).</p></div></div>
+            <div class="card">
+                <form id="verif" class="toolbar"><input class="input" id="codigo" placeholder="Código de boleto" style="width:260px;text-transform:uppercase" required><button class="btn primary">Verificar</button></form>
+                <div id="resultadoBoleto" style="margin-top:18px"></div>
+            </div>`;
+        $("verif").onsubmit = async e => {
+            e.preventDefault();
+            try {
+                const b = await api(`/boletos/${encodeURIComponent($("codigo").value.trim())}`);
+                const valido = b.estado === "Vigente" && !["Cancelado", "Finalizado"].includes(b.estado_viaje);
+                $("resultadoBoleto").innerHTML = `
+                    <div class="alert ${valido ? "bajo" : "alto"}"><span class="ico">${valido ? "✅" : "⛔"}</span><div><b>${valido ? "Boleto válido" : "Boleto no válido para embarque"}</b> · Estado: ${esc(b.estado)} · Viaje: ${esc(b.estado_viaje)}</div></div>
+                    <div class="detail-grid" style="margin-top:14px">
+                        <div><small>Pasajero</small><b>${esc(b.nombres)} ${esc(b.apellidos)}</b></div>
+                        <div><small>DNI</small><b>${esc(b.dni)}</b></div>
+                        <div><small>Asiento</small><b>${esc(b.asiento)}</b></div>
+                        <div><small>Ruta</small><b>${esc(b.origen)} → ${esc(b.destino)}</b></div>
+                        <div><small>Salida</small><b>${fmt.fecha(b.fecha_salida)} ${b.hora_salida}</b></div>
+                        <div><small>Empresa / bus</small><b>${esc(b.empresa)} · ${esc(b.placa)}</b></div>
+                    </div>`;
+            } catch (err) {
+                $("resultadoBoleto").innerHTML = `<div class="alert alto"><span class="ico">⛔</span><div>${esc(err.message)}</div></div>`;
+            }
+        };
+    }
+
+    /* =====================================================================
+       Reportes (RF25)
+       ===================================================================== */
+    async function vistaReportes() {
+        const hasta = fmt.hoy(), desde = fmt.sumarDias(hasta, -30);
+        main.innerHTML = `
+            <div class="page-head">
+                <div><h1>Reportes</h1><p>Puntualidad, retrasos, ocupación, ventas y pasajeros por ruta y período.</p></div>
+                <form class="toolbar" id="filtroRep">
+                    <input type="date" class="input" name="desde" value="${desde}">
+                    <input type="date" class="input" name="hasta" value="${hasta}">
+                    <select class="input" name="id_ruta"><option value="">Todas las rutas</option></select>
+                    <button class="btn primary">Generar</button>
+                </form>
+            </div>
+            <div id="reporte"><div class="empty">Cargando...</div></div>`;
+
+        try {
+            const rutas = await opciones("rutas", "id_ruta", r => `${r.origen} → ${r.destino}`);
+            document.querySelector('#filtroRep [name="id_ruta"]').innerHTML += rutas.map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join("");
+        } catch { /* sin rutas */ }
+
+        const generar = async () => {
+            const d = leerFormulario($("filtroRep"));
+            const q = new URLSearchParams({ desde: d.desde, hasta: d.hasta });
+            if (d.id_ruta) q.set("id_ruta", d.id_ruta);
+            $("reporte").innerHTML = '<div class="empty">Generando reporte...</div>';
+            try {
+                const r = await api(`/admin/reportes?${q}`);
+                window.__reporte = r;
+                const t = r.totales;
+                const maxDia = Math.max(1, ...r.ventasPorDia.map(x => x.ventas));
+                $("reporte").innerHTML = `
+                    <div class="kpis">
+                        ${[["Ventas", fmt.money(t.ventas)], ["Pasajeros", t.pasajeros], ["Viajes", t.viajes], ["Cancelados", t.cancelados],
+                           ["Ocupación promedio", t.ocupacion_pct == null ? "—" : t.ocupacion_pct + " %"], ["Puntualidad", t.puntualidad_pct == null ? "—" : t.puntualidad_pct + " %"],
+                           ["Reembolsado", fmt.money(t.reembolsos)], ["Reembolsos pendientes", t.reembolsos_pendientes]]
+                          .map(([k, v]) => `<div class="kpi"><span>${k}</span><strong>${v}</strong></div>`).join("")}
+                    </div>
+
+                    <div class="card">
+                        <h2>Ventas por día (S/) <small>${fmt.fecha(r.desde)} – ${fmt.fecha(r.hasta)}</small></h2>
+                        ${r.ventasPorDia.length ? `
+                            <div class="cols">${r.ventasPorDia.map(x => `
+                                <div class="col" style="height:${Math.max(1, 100 * x.ventas / maxDia)}%">
+                                    <span class="tip">${fmt.fecha(x.fecha)} · ${fmt.money(x.ventas)} · ${x.pasajeros} pasajeros</span>
+                                </div>`).join("")}</div>
+                            <div class="cols-axis"><span>${fmt.fecha(r.ventasPorDia[0].fecha)}</span><span>máx. ${fmt.money(maxDia)}</span><span>${fmt.fecha(r.ventasPorDia[r.ventasPorDia.length - 1].fecha)}</span></div>`
+                            : '<div class="empty">Sin ventas en el período.</div>'}
+                    </div>
+
+                    <div class="card">
+                        <h2>Ventas y pasajeros por ruta <button class="btn sm" onclick="exportarCSV(window.__reporte.ventasPorRuta, 'ventas_por_ruta.csv')">⬇ CSV</button></h2>
+                        <div class="table-wrap">${tablaReporte(r.ventasPorRuta, [["ruta", "Ruta"], ["reservas", "Reservas", "num"], ["pasajeros", "Pasajeros", "num"],
+                            ["ventas", "Ventas", "bar", v => fmt.money(v)]])}</div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Ocupación por ruta <button class="btn sm" onclick="exportarCSV(window.__reporte.ocupacionPorRuta, 'ocupacion_por_ruta.csv')">⬇ CSV</button></h2>
+                        <div class="table-wrap">${tablaReporte(r.ocupacionPorRuta, [["ruta", "Ruta"], ["viajes", "Viajes", "num"], ["capacidad", "Asientos ofertados", "num"],
+                            ["vendidos", "Vendidos", "num"], ["ocupacion_pct", "Ocupación", "pct"]])}</div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Puntualidad y retrasos por ruta <small>tolerancia 5 min</small> <button class="btn sm" onclick="exportarCSV(window.__reporte.puntualidad, 'puntualidad.csv')">⬇ CSV</button></h2>
+                        <div class="table-wrap">${tablaReporte(r.puntualidad, [["ruta", "Ruta"], ["viajes_salidos", "Salidas", "num"], ["puntuales", "Puntuales", "num"],
+                            ["retrasados", "Retrasados", "num"], ["retraso_promedio_min", "Retraso prom. (min)", "num"], ["retraso_maximo_min", "Máx. (min)", "num"],
+                            ["puntualidad_pct", "Puntualidad", "pct"]])}</div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Ocupación por bus <button class="btn sm" onclick="exportarCSV(window.__reporte.ocupacionPorBus, 'ocupacion_por_bus.csv')">⬇ CSV</button></h2>
+                        <div class="table-wrap">${tablaReporte(r.ocupacionPorBus, [["placa", "Bus"], ["empresa", "Empresa"], ["tipo_servicio", "Servicio"],
+                            ["viajes", "Viajes", "num"], ["ocupacion_pct", "Ocupación", "pct"]])}</div>
+                    </div>`;
+            } catch (err) { $("reporte").innerHTML = `<div class="card empty">${esc(err.message)}</div>`; }
+        };
+        $("filtroRep").onsubmit = e => { e.preventDefault(); generar(); };
+        generar();
+    }
+
+    function tablaReporte(filas, cols) {
+        if (!filas.length) return '<div class="empty">Sin datos en el período.</div>';
+        const maximos = {};
+        cols.filter(c => c[2] === "bar").forEach(([k]) => maximos[k] = Math.max(1, ...filas.map(f => f[k] || 0)));
+        return `<table><thead><tr>${cols.map(([, t, tipo]) => `<th class="${tipo === "num" ? "num" : ""}">${t}</th>`).join("")}</tr></thead>
+            <tbody>${filas.map(f => `<tr>${cols.map(([k, , tipo, render]) => {
+                if (tipo === "pct") return `<td>${barra(f[k])}</td>`;
+                if (tipo === "bar") return `<td>${barra(100 * (f[k] || 0) / maximos[k], render ? render(f[k]) : f[k])}</td>`;
+                return `<td class="${tipo === "num" ? "num" : ""}">${esc(f[k] ?? "—")}</td>`;
+            }).join("")}</tr>`).join("")}</tbody></table>`;
+    }
+
+    /* =====================================================================
+       Navegación
+       ===================================================================== */
+    const TODOS = ["ADMIN", "EMPRESA", "VENDEDOR"], GESTION = ["ADMIN", "EMPRESA"];
+    const MENU = [
+        { grupo: "Operación", roles: TODOS },
+        { id: "dashboard", icono: "📊", texto: "Dashboard", vista: vistaDashboard, roles: TODOS },
+        { id: "programacion", icono: "🗓️", texto: "Programación", vista: vistaProgramacion, roles: TODOS },
+        { id: "boletos", icono: "🎫", texto: "Verificar boleto", vista: vistaBoletos, roles: TODOS },
+        { id: "reembolsos", icono: "💸", texto: "Reembolsos", vista: vistaReembolsos, roles: TODOS },
+        { id: "pasajeros", icono: "🧍", texto: "Pasajeros", vista: () => vistaCrud("pasajeros"), roles: ["ADMIN", "VENDEDOR"] },
+        { grupo: ES_EMPRESA ? "Mi flota" : "Flota y rutas", roles: GESTION },
+        { id: "buses", icono: "🚌", texto: "Buses", vista: () => vistaCrud("buses"), roles: GESTION },
+        { id: "conductores", icono: "🧑‍✈️", texto: "Conductores", vista: () => vistaCrud("conductores"), roles: GESTION },
+        { id: "horarios", icono: "⏰", texto: "Horarios", vista: () => vistaCrud("horarios"), roles: GESTION },
+        { id: "ciudades", icono: "🏙️", texto: "Ciudades", vista: () => vistaCrud("ciudades"), roles: ["ADMIN"] },
+        { id: "terminales", icono: "🚏", texto: "Terminales", vista: () => vistaCrud("terminales"), roles: ["ADMIN"] },
+        { id: "rutas", icono: "🛣️", texto: "Rutas", vista: () => vistaCrud("rutas"), roles: ["ADMIN"] },
+        { grupo: ES_EMPRESA ? "Mi empresa" : "Administración", roles: GESTION },
+        { id: "empresas", icono: "🏢", texto: ES_EMPRESA ? "Datos de la empresa" : "Empresas", vista: () => vistaCrud("empresas"), roles: GESTION },
+        { id: "usuarios", icono: "👥", texto: ES_EMPRESA ? "Usuarios" : "Usuarios y roles", vista: () => vistaCrud("usuarios"), roles: GESTION },
+        { id: "reportes", icono: "📈", texto: "Reportes", vista: vistaReportes, roles: GESTION },
+        { id: "parametros", icono: "⚙️", texto: "Parámetros", vista: () => vistaCrud("parametros"), roles: ["ADMIN"] }
+    ].filter(m => m.roles.includes(ROL));
+
+    let vistaActual = "dashboard";
+
+    function navegar(id) {
+        const item = MENU.find(m => m.id === id) || MENU.find(m => m.id);
+        vistaActual = item.id;
+        document.querySelectorAll(".sidebar button").forEach(b => b.classList.toggle("active", b.dataset.id === item.id));
+        document.querySelector(".sidebar").classList.remove("open");
+        history.replaceState(null, "", `#${item.id}`);
+        item.vista();
+    }
+
+    $("sidebar").innerHTML = MENU.map(m => m.grupo
+        ? `<h4>${m.grupo}</h4>`
+        : `<button data-id="${m.id}" onclick="navegar('${m.id}')"><span>${m.icono}</span>${m.texto}</button>`).join("");
+
+    navegar(location.hash.slice(1) || "dashboard");
+    </script>
+
+</body>
+</html>

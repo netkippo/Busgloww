@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BusGlow | Resultados</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary:#e53935;
+            --blue:#0b2d4d;
+            --muted:#718096;
+            --border:#e4e8ed;
+        }
+
+        * {
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+        }
+
+        body {
+            font-family:Inter,sans-serif;
+            background:#f5f7fa;
+            color:#263238;
+        }
+
+        header {
+            height:72px;
+            background:white;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:0 6%;
+            border-bottom:1px solid #eee;
+        }
+
+        .logo {
+            font-size:25px;
+            font-weight:800;
+            color:var(--blue);
+        }
+
+        .logo span {
+            color:var(--primary);
+        }
+
+        nav {
+            display:flex;
+            gap:20px;
+        }
+
+        nav a {
+            text-decoration:none;
+            color:#475569;
+            font-size:13px;
+            font-weight:600;
+        }
+
+        .container {
+            max-width:1150px;
+            margin:40px auto;
+            padding:0 20px;
+        }
+
+        .search-summary {
+            background:linear-gradient(135deg,#0b2d4d,#164a73);
+            color:white;
+            padding:25px;
+            border-radius:15px;
+            margin-bottom:25px;
+        }
+
+        .search-summary h1 {
+            font-size:25px;
+            margin-bottom:8px;
+        }
+
+        .search-summary p {
+            color:#dbe8f1;
+            font-size:13px;
+        }
+
+        .layout {
+            display:grid;
+            grid-template-columns:240px 1fr;
+            gap:25px;
+        }
+
+        .filters {
+            background:white;
+            border-radius:14px;
+            padding:22px;
+            height:max-content;
+            box-shadow:0 8px 25px rgba(0,0,0,.06);
+        }
+
+        .filters h3 {
+            color:var(--blue);
+            margin-bottom:20px;
+        }
+
+        .filter {
+            border-top:1px solid #eee;
+            padding:15px 0;
+        }
+
+        .filter label {
+            display:block;
+            margin:9px 0;
+            font-size:13px;
+            color:#64748b;
+        }
+
+        .bus-card {
+            background:white;
+            padding:22px;
+            border-radius:14px;
+            margin-bottom:18px;
+            box-shadow:0 8px 25px rgba(0,0,0,.06);
+        }
+
+        .bus-top {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+        }
+
+        .company {
+            font-weight:800;
+            color:var(--blue);
+            font-size:18px;
+        }
+
+        .service {
+            background:#fff0ef;
+            color:var(--primary);
+            padding:6px 10px;
+            border-radius:20px;
+            font-size:11px;
+            font-weight:700;
+        }
+
+        .route-time {
+            display:grid;
+            grid-template-columns:1fr 100px 1fr;
+            align-items:center;
+            text-align:center;
+            margin:20px 0;
+        }
+
+        .time {
+            font-size:24px;
+            font-weight:800;
+            color:var(--blue);
+        }
+
+        .city {
+            color:var(--muted);
+            font-size:12px;
+        }
+
+        .duration {
+            color:var(--muted);
+            font-size:11px;
+        }
+
+        .bus-bottom {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border-top:1px solid #eee;
+            padding-top:18px;
+        }
+
+        .price {
+            color:var(--primary);
+            font-size:23px;
+            font-weight:800;
+        }
+
+        button {
+            background:var(--primary);
+            border:0;
+            color:white;
+            border-radius:8px;
+            padding:12px 20px;
+            font-weight:800;
+            cursor:pointer;
+        }
+
+        button:hover {
+            background:#c62828;
+        }
+
+        @media(max-width:800px) {
+            .layout {
+                grid-template-columns:1fr;
+            }
+
+            .filters {
+                display:none;
+            }
+        }
+
+        .filter strong { color: var(--blue); font-size: 13px; }
+        .filter select { width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; margin-top: 9px; font-family: inherit; }
+        .date-nav { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+        .date-nav a { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); color: white; text-decoration: none;
+                      padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+        .date-nav a.active { background: white; color: var(--blue); }
+        .meta { display: flex; gap: 14px; flex-wrap: wrap; color: var(--muted); font-size: 12px; margin-top: 6px; }
+        .seats-left { color: #16815f; font-weight: 700; }
+        .seats-left.low { color: var(--primary); }
+        .empty { background: white; border-radius: 14px; padding: 40px; text-align: center; color: var(--muted); box-shadow: 0 8px 25px rgba(0,0,0,.06); }
+        .empty h3 { color: var(--blue); margin-bottom: 8px; }
+        .empty .chips { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+        .empty .chips a { border: 1px solid var(--primary); color: var(--primary); border-radius: 20px; padding: 7px 12px; font-size: 12px; font-weight: 700; text-decoration: none; }
+        .notice { background: #fff8e6; border: 1px solid #ffe2a8; color: #8a5a00; padding: 12px 15px; border-radius: 10px; font-size: 13px; margin-bottom: 18px; }
+        .results-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: var(--muted); font-size: 13px; }
+        .results-bar select { height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 0 8px; font-family: inherit; }
+        .skeleton { height: 170px; border-radius: 14px; margin-bottom: 18px; background: linear-gradient(90deg,#eef2f5,#f8fafc,#eef2f5); background-size: 200% 100%; animation: sk 1.2s infinite; }
+        @keyframes sk { to { background-position: -200% 0; } }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <a href="index.html" class="logo">
+        🚌 Bus<span>Glow</span>
+    </a>
+
+    <nav>
+        <a href="index.html">Inicio</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="perfil.html#viajes">Mis viajes</a>
+        <a href="admin.html" data-staff-link style="display:none">⚙️ Panel</a>
+        <a href="login.html" data-auth-link>👤 Ingresar</a>
+    </nav>
+
+</header>
+
+<main class="container">
+
+    <section class="search-summary">
+
+        <h1 id="ruta">Buscando viajes...</h1>
+
+        <p id="subtitulo">
+            Encuentra el mejor horario para tu viaje.
+        </p>
+
+        <div class="date-nav" id="dateNav"></div>
+
+    </section>
+
+    <div id="avisoRegreso"></div>
+
+    <div class="layout">
+
+        <aside class="filters">
+
+            <h3>Filtrar resultados</h3>
+
+            <div class="filter" id="filtroServicio">
+                <strong>Servicio</strong>
+            </div>
+
+            <div class="filter">
+                <strong>Horario</strong>
+
+                <label><input type="checkbox" name="horario" value="manana"> Mañana (05:00 – 11:59)</label>
+                <label><input type="checkbox" name="horario" value="tarde"> Tarde (12:00 – 18:59)</label>
+                <label><input type="checkbox" name="horario" value="noche"> Noche (19:00 – 04:59)</label>
+            </div>
+
+            <div class="filter" id="filtroEmpresa">
+                <strong>Empresa</strong>
+            </div>
+
+        </aside>
+
+        <section>
+
+            <div class="results-bar">
+                <span id="contador"></span>
+                <label>Ordenar:
+                    <select id="orden">
+                        <option value="hora">Hora de salida</option>
+                        <option value="precio">Menor precio</option>
+                        <option value="duracion">Menor duración</option>
+                    </select>
+                </label>
+            </div>
+
+            <div id="lista">
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<script src="js/api.js"></script>
+<script>
+const { api, fmt, esc, params, toast } = BusGlow;
+
+const origen = params.get("origen") || "";
+const destino = params.get("destino") || "";
+const fecha = params.get("fecha") || fmt.hoy();
+const pasajeros = parseInt(params.get("pasajeros"), 10) || 1;
+const regreso = params.get("regreso");
+
+let viajes = [];
+
+function urlBusqueda(nuevaFecha) {
+    const q = new URLSearchParams(location.search);
+    q.set("fecha", nuevaFecha);
+    return "resultados.html?" + q.toString();
+}
+
+function pintarCabecera() {
+    document.getElementById("ruta").textContent = `${origen} → ${destino}`;
+    document.getElementById("subtitulo").textContent =
+        `${fmt.fechaLarga(fecha)} · ${pasajeros} pasajero${pasajeros > 1 ? "s" : ""}`;
+
+    const nav = document.getElementById("dateNav");
+    const dias = [-2, -1, 0, 1, 2].map(n => fmt.sumarDias(fecha, n)).filter(f => f >= fmt.hoy());
+    nav.innerHTML = dias.map(f =>
+        `<a href="${urlBusqueda(f)}" class="${f === fecha ? "active" : ""}">${fmt.fecha(f)}</a>`).join("");
+
+    if (regreso) {
+        document.getElementById("avisoRegreso").innerHTML =
+            `<div class="notice">↩️ Viaje de ida y vuelta: después de comprar tu pasaje de ida podrás elegir el regreso del <b>${fmt.fecha(regreso)}</b>.</div>`;
+        try {
+            sessionStorage.setItem("busglow_regreso", JSON.stringify({ origen: destino, destino: origen, fecha: regreso, pasajeros }));
+        } catch { /* sin almacenamiento */ }
+    }
+}
+
+function franja(hora) {
+    const h = parseInt(hora, 10);
+    if (h >= 5 && h < 12) return "manana";
+    if (h >= 12 && h < 19) return "tarde";
+    return "noche";
+}
+
+function pintarFiltros() {
+    const servicios = [...new Set(viajes.map(v => v.tipo_servicio))].sort();
+    const empresas = [...new Set(viajes.map(v => v.empresa))].sort();
+    document.getElementById("filtroServicio").innerHTML = "<strong>Servicio</strong>" +
+        (servicios.map(s => `<label><input type="checkbox" name="servicio" value="${esc(s)}"> ${esc(s)}</label>`).join("") || "<label>—</label>");
+    document.getElementById("filtroEmpresa").innerHTML = "<strong>Empresa</strong>" +
+        (empresas.map(e => `<label><input type="checkbox" name="empresa" value="${esc(e)}"> ${esc(e)}</label>`).join("") || "<label>—</label>");
+    document.querySelectorAll(".filters input").forEach(i => i.addEventListener("change", pintarLista));
+}
+
+function marcados(nombre) {
+    return [...document.querySelectorAll(`input[name="${nombre}"]:checked`)].map(i => i.value);
+}
+
+function pintarLista() {
+    const servicios = marcados("servicio"), horarios = marcados("horario"), empresas = marcados("empresa");
+    const orden = document.getElementById("orden").value;
+
+    let lista = viajes.filter(v =>
+        (!servicios.length || servicios.includes(v.tipo_servicio)) &&
+        (!horarios.length || horarios.includes(franja(v.hora_salida))) &&
+        (!empresas.length || empresas.includes(v.empresa)));
+
+    lista.sort((a, b) =>
+        orden === "precio" ? a.precio - b.precio :
+        orden === "duracion" ? a.duracion_minutos - b.duracion_minutos :
+        a.hora_salida.localeCompare(b.hora_salida));
+
+    document.getElementById("contador").textContent = `${lista.length} viaje${lista.length === 1 ? "" : "s"} disponible${lista.length === 1 ? "" : "s"}`;
+
+    if (!lista.length) {
+        document.getElementById("lista").innerHTML = viajes.length
+            ? `<div class="empty"><h3>Sin coincidencias</h3>Ningún viaje cumple con los filtros seleccionados.</div>`
+            : document.getElementById("lista").innerHTML;
+        return;
+    }
+
+    document.getElementById("lista").innerHTML = lista.map(v => `
+        <div class="bus-card">
+            <div class="bus-top">
+                <div>
+                    <div class="company">🚌 ${esc(v.empresa)}</div>
+                    <div class="meta">
+                        <span>📍 ${esc(v.terminal_origen || v.origen)}</span>
+                        <span>🪪 Bus ${esc(v.placa)}</span>
+                        ${v.estado === "Retrasado" ? '<span style="color:#e53935;font-weight:700">⚠ Retrasado</span>' : ""}
+                    </div>
+                </div>
+                <span class="service">${esc(v.tipo_servicio.toUpperCase())}</span>
+            </div>
+
+            <div class="route-time">
+                <div>
+                    <div class="time">${v.hora_salida}</div>
+                    <div class="city">${esc(v.origen)}</div>
+                </div>
+                <div class="duration">
+                    ${esc(v.duracion_estimada || fmt.duracion(v.duracion_minutos))}
+                    <br>────────
+                </div>
+                <div>
+                    <div class="time">${v.hora_llegada}</div>
+                    <div class="city">${esc(v.destino)}${v.fecha_llegada !== v.fecha_salida ? " (+1)" : ""}</div>
+                </div>
+            </div>
+
+            <div class="bus-bottom">
+                <div>
+                    <small>Precio por pasajero · <span class="seats-left ${v.asientos_disponibles <= 5 ? "low" : ""}">${v.asientos_disponibles} asientos libres</span></small>
+                    <div class="price">${fmt.money(v.precio)}</div>
+                </div>
+                <button onclick="elegirBus(${v.id_viaje})">Elegir viaje</button>
+            </div>
+        </div>`).join("");
+}
+
+async function buscar() {
+    if (!origen || !destino) {
+        location.href = "index.html";
+        return;
+    }
+    pintarCabecera();
+    try {
+        const q = new URLSearchParams({ origen, destino, fecha, pasajeros });
+        const data = await api("/viajes/buscar?" + q.toString(), { auth: false });
+        viajes = data.viajes;
+
+        if (!viajes.length) {
+            const chips = data.sugerencias.map(s =>
+                `<a href="${urlBusqueda(s.fecha)}">${fmt.fecha(s.fecha)} · desde ${fmt.money(s.precio_desde)}</a>`).join("");
+            document.getElementById("lista").innerHTML = `
+                <div class="empty">
+                    <h3>No encontramos viajes para esta fecha</h3>
+                    Prueba con otra fecha u otra ruta.
+                    ${chips ? `<div class="chips">${chips}</div>` : ""}
+                </div>`;
+        }
+        pintarFiltros();
+        pintarLista();
+    } catch (err) {
+        document.getElementById("lista").innerHTML = `<div class="empty"><h3>No se pudo realizar la búsqueda</h3>${esc(err.message)}</div>`;
+    }
+}
+
+function elegirBus(idViaje) {
+    location.href = `asientos.html?viaje=${idViaje}&pasajeros=${pasajeros}`;
+}
+
+document.getElementById("orden").addEventListener("change", pintarLista);
+buscar();
+</script>
+
+</body>
+</html>

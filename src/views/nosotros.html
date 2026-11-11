@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BusGlow | Nosotros</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary:#e53935;
+            --blue:#0b2d4d;
+            --muted:#718096;
+        }
+
+        * {
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+        }
+
+        body {
+            font-family:Inter,sans-serif;
+            background:#f5f7fa;
+            color:#263238;
+        }
+
+        header {
+            height:72px;
+            background:white;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:0 6%;
+            border-bottom:1px solid #eee;
+        }
+
+        .logo {
+            text-decoration:none;
+            font-size:25px;
+            font-weight:800;
+            color:var(--blue);
+        }
+
+        .logo span {
+            color:var(--primary);
+        }
+
+        nav {
+            display:flex;
+            gap:25px;
+        }
+
+        nav a {
+            text-decoration:none;
+            color:#475569;
+            font-size:14px;
+            font-weight:600;
+        }
+
+        .hero {
+            background:linear-gradient(135deg,#0b2d4d,#164a73);
+            color:white;
+            text-align:center;
+            padding:80px 20px;
+        }
+
+        .hero h1 {
+            font-size:45px;
+            margin-bottom:15px;
+        }
+
+        .hero p {
+            color:#dce8f0;
+        }
+
+        .container {
+            max-width:1100px;
+            margin:60px auto;
+            padding:0 20px;
+        }
+
+        .cards {
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:25px;
+        }
+
+        .card {
+            background:white;
+            padding:35px;
+            border-radius:16px;
+            box-shadow:0 10px 30px rgba(0,0,0,.08);
+        }
+
+        .icon {
+            font-size:35px;
+            margin-bottom:15px;
+        }
+
+        .card h2 {
+            color:var(--blue);
+            margin-bottom:12px;
+        }
+
+        .card p {
+            color:var(--muted);
+            font-size:14px;
+            line-height:1.8;
+        }
+
+        .values {
+            margin-top:30px;
+            background:white;
+            padding:35px;
+            border-radius:16px;
+            text-align:center;
+        }
+
+        .values h2 {
+            color:var(--blue);
+            margin-bottom:25px;
+        }
+
+        .value-grid {
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:15px;
+        }
+
+        .value {
+            padding:20px;
+            background:#fff5f4;
+            border-radius:12px;
+        }
+
+        .value strong {
+            display:block;
+            color:var(--primary);
+            margin-top:8px;
+        }
+
+        footer {
+            background:#081c2c;
+            color:white;
+            text-align:center;
+            padding:35px;
+        }
+
+        @media(max-width:700px) {
+            nav {
+                display:none;
+            }
+
+            .cards,
+            .value-grid {
+                grid-template-columns:1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <a href="index.html" class="logo">
+        🚌 Bus<span>Glow</span>
+    </a>
+
+    <nav>
+        <a href="index.html">Inicio</a>
+        <a href="nosotros.html">Nosotros</a>
+        <a href="index.html#ofertas">Ofertas</a>
+        <a href="index.html#ayuda">Ayuda</a>
+        <a href="login.html" data-auth-link>Ingresar</a>
+    </nav>
+
+</header>
+
+<section class="hero">
+    <h1>Conoce BusGlow</h1>
+    <p>
+        Conectamos personas con destinos.
+    </p>
+</section>
+
+<main class="container">
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="icon">🎯</div>
+
+            <h2>Nuestra misión</h2>
+
+            <p>
+                Facilitar la búsqueda y compra de pasajes de bus
+                mediante una plataforma rápida, sencilla y segura,
+                permitiendo que nuestros usuarios comparen diferentes
+                alternativas y encuentren el viaje que mejor se adapte
+                a sus necesidades.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="icon">👁️</div>
+
+            <h2>Nuestra visión</h2>
+
+            <p>
+                Ser una de las principales plataformas digitales de
+                transporte terrestre del Perú, reconocida por su
+                innovación, facilidad de uso, seguridad y compromiso
+                con los viajeros.
+            </p>
+        </div>
+
+    </div>
+
+    <section class="values">
+
+        <h2>Nuestros valores</h2>
+
+        <div class="value-grid">
+
+            <div class="value">
+                🔒
+                <strong>Seguridad</strong>
+            </div>
+
+            <div class="value">
+                🤝
+                <strong>Confianza</strong>
+            </div>
+
+            <div class="value">
+                ⚡
+                <strong>Rapidez</strong>
+            </div>
+
+            <div class="value">
+                💡
+                <strong>Innovación</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    © 2026 BusGlow. Todos los derechos reservados.
+</footer>
+
+<script src="js/api.js"></script>
+
+</body>
+</html>

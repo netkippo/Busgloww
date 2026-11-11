@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusGlow | Selección de asientos</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --blue: #0b2d4d;
+            --blue-light: #164a73;
+            --green: #16a085;
+            --muted: #718096;
+            --background: #f5f7fa;
+            --white: #ffffff;
+            --border: #e4e8ed;
+            --occupied: #ffcdd2;
+            --occupied-text: #c62828;
+            --available: #dff6ed;
+            --available-text: #16815f;
+            --selected: #0b2d4d;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--background);
+            color: #263238;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        /* HEADER */
+
+        header {
+            height: 72px;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo {
+            text-decoration: none;
+            color: var(--blue);
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .back-button {
+            text-decoration: none;
+            color: #475569;
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .back-button:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* MAIN */
+
+        main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            color: var(--blue);
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* BUS */
+
+        .bus-card {
+            background: white;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .bus-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .bus-header h2 {
+            font-size: 18px;
+            color: var(--blue);
+        }
+
+        .bus-header span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .bus {
+            max-width: 460px;
+            margin: auto;
+            background: #eef2f5;
+            border: 2px solid #d7dde3;
+            border-radius: 35px 35px 20px 20px;
+            padding: 25px 22px 30px;
+        }
+
+        .driver {
+            background: var(--blue);
+            color: white;
+            height: 55px;
+            border-radius: 20px 20px 10px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-bottom: 25px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .driver-icon {
+            font-size: 22px;
+        }
+
+        .seats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 26px 1fr 1fr;
+            gap: 13px;
+        }
+
+        .seat {
+            height: 55px;
+            border: none;
+            border-radius: 10px 10px 7px 7px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .seat::after {
+            content: "";
+            position: absolute;
+            bottom: -3px;
+            left: 8px;
+            right: 8px;
+            height: 5px;
+            border-radius: 0 0 5px 5px;
+            background: currentColor;
+            opacity: 0.2;
+        }
+
+        .seat.available {
+            background: var(--available);
+            color: var(--available-text);
+            border: 1px solid #b9ead9;
+        }
+
+        .seat.available:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(22, 160, 133, 0.2);
+        }
+
+        .seat.occupied {
+            background: var(--occupied);
+            color: var(--occupied-text);
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .seat.selected {
+            background: var(--selected);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(11, 45, 77, 0.25);
+        }
+
+        .aisle {
+            grid-column: 3;
+            pointer-events: none;
+        }
+
+        /* LEYENDA */
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+        }
+
+        .legend-available {
+            background: var(--available);
+            border: 1px solid #b9ead9;
+        }
+
+        .legend-occupied {
+            background: var(--occupied);
+            border: 1px solid #ef9a9a;
+        }
+
+        .legend-selected {
+            background: var(--selected);
+        }
+
+        /* RESUMEN */
+
+        .summary {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary h2 {
+            color: var(--blue);
+            font-size: 19px;
+            margin-bottom: 22px;
+        }
+
+        .route {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .route-label {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .route strong {
+            color: var(--blue);
+            font-size: 15px;
+        }
+
+        .route-arrow {
+            color: var(--primary);
+            margin: 0 7px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            font-size: 14px;
+        }
+
+        .summary-row span:first-child {
+            color: var(--muted);
+        }
+
+        .summary-row span:last-child {
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 20px 0;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .total span:first-child {
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        .total-price {
+            color: var(--primary);
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .continue-button {
+            width: 100%;
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .continue-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .continue-button:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 12px;
+            min-height: 18px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 850px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .summary {
+                position: static;
+            }
+        }
+
+        @media (max-width: 500px) {
+            header {
+                padding: 0 20px;
+            }
+
+            .logo {
+                font-size: 21px;
+            }
+
+            main {
+                margin-top: 25px;
+            }
+
+            .page-title h1 {
+                font-size: 24px;
+            }
+
+            .bus-card {
+                padding: 18px;
+            }
+
+            .bus {
+                padding: 20px 15px 25px;
+            }
+
+            .seats {
+                gap: 9px;
+            }
+
+            .seat {
+                height: 48px;
+                font-size: 12px;
+            }
+
+            .legend {
+                gap: 12px;
+            }
+        }
+
+        .seat.reserved { background: #fff3cd; color: #9a6b00; cursor: not-allowed; opacity: .85; }
+        .seat.maintenance { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+        .legend-reserved { background: #fff3cd; border: 1px solid #ffe08a; }
+        .floor-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+        .floor-tabs button { border: 1px solid var(--border); background: white; border-radius: 8px; padding: 8px 14px; font-weight: 700; color: #64748b; }
+        .floor-tabs button.active { background: var(--blue); color: white; border-color: var(--blue); }
+        .passengers { margin-top: 25px; }
+        .passenger { border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .passenger h3 { font-size: 14px; color: var(--blue); margin-bottom: 12px; }
+        .passenger-grid { display: grid; grid-template-columns: 1fr 1fr 130px; gap: 10px; }
+        .passenger label { display: block; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 5px; }
+        .passenger input { width: 100%; height: 42px; border: 1px solid var(--border); border-radius: 8px; padding: 0 11px; font-family: inherit; outline: none; }
+        .passenger input:focus { border-color: var(--primary); }
+        .hint { color: var(--muted); font-size: 12px; text-align: center; padding: 18px; border: 1px dashed var(--border); border-radius: 12px; }
+        .login-note { background: #f0f7ff; border: 1px solid #d4e6fb; color: var(--blue); border-radius: 10px; padding: 12px; font-size: 12px; margin-bottom: 15px; }
+        .login-note a { color: var(--primary); font-weight: 700; }
+        @media (max-width: 600px) { .passenger-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html" class="logo">Bus<span>Glow</span></a>
+
+        <a href="javascript:history.back()" class="back-button">
+            ← Volver
+        </a>
+    </header>
+
+    <main>
+
+        <div class="page-title">
+            <h1>Selecciona tu asiento</h1>
+            <p id="instruccion">Elige los asientos disponibles para continuar.</p>
+        </div>
+
+        <div class="content">
+
+            <!-- MAPA DEL BUS -->
+            <section class="bus-card">
+
+                <div class="bus-header">
+                    <h2>Mapa de asientos</h2>
+                    <span id="busInfo">Cargando...</span>
+                </div>
+
+                <div class="floor-tabs" id="floorTabs"></div>
+
+                <div class="bus">
+
+                    <div class="driver">
+                        <span>🚍 Conductor</span>
+                        <span class="driver-icon">🛞</span>
+                    </div>
+
+                    <div class="seats" id="seats"></div>
+
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color legend-available"></div>
+                        Disponible
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-occupied"></div>
+                        Ocupado
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-reserved"></div>
+                        En proceso de compra
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-selected"></div>
+                        Seleccionado
+                    </div>
+                </div>
+
+                <!-- DATOS DE PASAJEROS -->
+                <div class="passengers" id="passengers">
+                    <div class="hint">Selecciona un asiento para ingresar los datos del pasajero.</div>
+                </div>
+
+            </section>
+
+            <!-- RESUMEN -->
+            <aside class="summary">
+
+                <h2>Resumen del viaje</h2>
+
+                <div class="route">
+                    <div class="route-label">Ruta</div>
+                    <strong id="rutaTexto">—</strong>
+                </div>
+
+                <div class="summary-row"><span>Empresa</span><span id="empresa">—</span></div>
+                <div class="summary-row"><span>Fecha</span><span id="fecha">—</span></div>
+                <div class="summary-row"><span>Hora</span><span id="hora">—</span></div>
+                <div class="summary-row"><span>Servicio</span><span id="servicio">—</span></div>
+                <div class="summary-row"><span>Asiento(s)</span><span id="selected-seat">No seleccionado</span></div>
+                <div class="summary-row"><span>Precio unitario</span><span id="ticket-price">S/ 0.00</span></div>
+
+                <hr class="divider">
+
+                <div class="total">
+                    <span>Total</span>
+                    <span class="total-price" id="total-price">S/ 0.00</span>
+                </div>
+
+                <div id="loginNote"></div>
+
+                <button class="continue-button" id="continue-button" disabled>
+                    Continuar al pago
+                </button>
+
+                <p class="message" id="message">
+                    Selecciona un asiento para continuar
+                </p>
+
+            </aside>
+
+        </div>
+
+    </main>
+
+    <script src="js/api.js"></script>
+    <script>
+        const { api, fmt, esc, params, toast, session } = BusGlow;
+
+        const idViaje = parseInt(params.get("viaje"), 10);
+        const objetivo = Math.min(6, parseInt(params.get("pasajeros"), 10) || 1);
+        const MAX = 6;
+
+        let viaje = null;
+        let asientos = [];
+        let pisoActual = 1;
+        const seleccion = new Map();      // id_asiento -> asiento
+        const datosPasajeros = {};        // id_asiento -> {nombres, apellidos, dni}
+
+        const $ = id => document.getElementById(id);
+
+        async function cargar() {
+            if (!idViaje) { location.href = "index.html"; return; }
+            try {
+                const data = await api(`/viajes/${idViaje}/asientos`, { auth: false });
+                viaje = data.viaje;
+                asientos = data.asientos;
+
+                $("rutaTexto").innerHTML = `${esc(viaje.origen)} <span class="route-arrow">→</span> ${esc(viaje.destino)}`;
+                $("empresa").textContent = viaje.empresa;
+                $("fecha").textContent = fmt.fecha(viaje.fecha_salida);
+                $("hora").textContent = fmt.hora12(viaje.hora_salida);
+                $("servicio").textContent = viaje.tipo_servicio;
+                $("ticket-price").textContent = fmt.money(viaje.precio);
+                $("busInfo").textContent = `Bus ${viaje.tipo_servicio} · ${viaje.placa}`;
+                $("instruccion").textContent = objetivo > 1
+                    ? `Elige ${objetivo} asientos disponibles (uno por pasajero).`
+                    : "Elige uno de los asientos disponibles para continuar.";
+
+                if (!data.vendible) {
+                    $("message").textContent = `Este viaje está ${viaje.estado}; no admite ventas.`;
+                }
+
+                const pisos = [...new Set(asientos.map(a => a.piso))];
+                $("floorTabs").innerHTML = pisos.length > 1
+                    ? pisos.map(p => `<button data-piso="${p}" class="${p === pisoActual ? "active" : ""}">Piso ${p}</button>`).join("")
+                    : "";
+                $("floorTabs").querySelectorAll("button").forEach(b => b.onclick = () => {
+                    pisoActual = parseInt(b.dataset.piso, 10);
+                    $("floorTabs").querySelectorAll("button").forEach(x => x.classList.toggle("active", x === b));
+                    pintarAsientos(data.vendible);
+                });
+
+                pintarAsientos(data.vendible);
+                pintarNotaLogin();
+            } catch (err) {
+                $("busInfo").textContent = "";
+                $("seats").innerHTML = `<p style="grid-column:1/-1;text-align:center;color:#718096">${esc(err.message)}</p>`;
+            }
+        }
+
+        function pintarAsientos(vendible) {
+            const clases = { Disponible: "available", Ocupado: "occupied", Reservado: "reserved", Mantenimiento: "maintenance" };
+            $("seats").innerHTML = asientos.filter(a => a.piso === pisoActual).map(a => {
+                const sel = seleccion.has(a.id_asiento);
+                const libre = a.estado === "Disponible" && vendible;
+                const titulo = a.estado === "Reservado" ? "Otro pasajero está comprando este asiento" : a.estado;
+                return `<button class="seat ${sel ? "selected" : clases[a.estado]}" style="grid-row:${a.fila};grid-column:${a.columna}"
+                            data-id="${a.id_asiento}" title="Asiento ${esc(a.numero)} · ${titulo}" ${libre || sel ? "" : "disabled"}>${esc(a.numero)}</button>`;
+            }).join("");
+            $("seats").querySelectorAll(".seat:not([disabled])").forEach(btn =>
+                btn.addEventListener("click", () => alternar(parseInt(btn.dataset.id, 10), vendible)));
+        }
+
+        function alternar(id, vendible) {
+            guardarFormulario();
+            if (seleccion.has(id)) {
+                seleccion.delete(id);
+            } else {
+                if (objetivo === 1 && seleccion.size === 1) seleccion.clear();   // cambiar de asiento
+                if (seleccion.size >= MAX) { toast(`Máximo ${MAX} asientos por compra.`, "warn"); return; }
+                seleccion.set(id, asientos.find(a => a.id_asiento === id));
+            }
+            pintarAsientos(vendible);
+            pintarResumen();
+            pintarPasajeros();
+        }
+
+        function pintarResumen() {
+            const lista = [...seleccion.values()];
+            $("selected-seat").textContent = lista.length ? lista.map(a => a.numero).join(", ") : "No seleccionado";
+            $("total-price").textContent = fmt.money(viaje.precio * lista.length);
+            $("continue-button").disabled = lista.length === 0;
+            $("message").textContent = !lista.length
+                ? "Selecciona un asiento para continuar"
+                : lista.length < objetivo
+                    ? `Seleccionaste ${lista.length} de ${objetivo} asientos`
+                    : `Asiento${lista.length > 1 ? "s" : ""} ${lista.map(a => a.numero).join(", ")} seleccionado${lista.length > 1 ? "s" : ""}`;
+        }
+
+        function pintarPasajeros() {
+            const lista = [...seleccion.values()];
+            if (!lista.length) {
+                $("passengers").innerHTML = '<div class="hint">Selecciona un asiento para ingresar los datos del pasajero.</div>';
+                return;
+            }
+            const u = session.user;
+            $("passengers").innerHTML = "<h2 style=\"font-size:18px;color:#0b2d4d;margin-bottom:14px\">Datos de los pasajeros</h2>" +
+                lista.map((a, i) => {
+                    let d = datosPasajeros[a.id_asiento];
+                    if (!d && i === 0 && u && u.rol === "CLIENTE") d = { nombres: u.nombres, apellidos: u.apellidos, dni: u.dni };
+                    d = d || {};
+                    return `
+                    <div class="passenger" data-id="${a.id_asiento}">
+                        <h3>Pasajero ${i + 1} · Asiento ${esc(a.numero)}</h3>
+                        <div class="passenger-grid">
+                            <div><label>NOMBRES</label><input name="nombres" value="${esc(d.nombres || "")}" required></div>
+                            <div><label>APELLIDOS</label><input name="apellidos" value="${esc(d.apellidos || "")}" required></div>
+                            <div><label>DNI</label><input name="dni" value="${esc(d.dni || "")}" maxlength="8" inputmode="numeric" required></div>
+                        </div>
+                    </div>`;
+                }).join("");
+        }
+
+        function guardarFormulario() {
+            document.querySelectorAll(".passenger").forEach(div => {
+                const id = parseInt(div.dataset.id, 10);
+                datosPasajeros[id] = {
+                    nombres: div.querySelector('[name="nombres"]').value.trim(),
+                    apellidos: div.querySelector('[name="apellidos"]').value.trim(),
+                    dni: div.querySelector('[name="dni"]').value.trim()
+                };
+            });
+        }
+
+        function pintarNotaLogin() {
+            if (!session.token) {
+                $("loginNote").innerHTML = `<div class="login-note">Para comprar necesitas una cuenta.
+                    <a href="login.html?next=${encodeURIComponent("asientos.html" + location.search)}">Inicia sesión</a> o
+                    <a href="registro.html?next=${encodeURIComponent("asientos.html" + location.search)}">regístrate</a>.</div>`;
+            }
+        }
+
+        $("continue-button").addEventListener("click", async () => {
+            guardarFormulario();
+            const lista = [...seleccion.values()];
+            if (!lista.length) return;
+
+            if (!session.token) {
+                toast("Inicia sesión para continuar con tu compra.", "warn");
+                setTimeout(() => location.href = `login.html?next=${encodeURIComponent("asientos.html" + location.search)}`, 900);
+                return;
+            }
+
+            for (const a of lista) {
+                const d = datosPasajeros[a.id_asiento];
+                if (!d.nombres || !d.apellidos || !/^\d{8}$/.test(d.dni)) {
+                    toast(`Completa los datos del pasajero del asiento ${a.numero} (DNI de 8 dígitos).`, "warn");
+                    return;
+                }
+            }
+
+            const btn = $("continue-button");
+            btn.disabled = true;
+            btn.textContent = "Reservando asientos...";
+            try {
+                const r = await api("/reservas", {
+                    method: "POST",
+                    body: { id_viaje: idViaje, asientos: lista.map(a => ({ id_asiento: a.id_asiento, pasajero: datosPasajeros[a.id_asiento] })) }
+                });
+                location.href = `pago.html?reserva=${r.reserva.id_reserva}`;
+            } catch (err) {
+                toast(err.message, "error", 6000);
+                btn.disabled = false;
+                btn.textContent = "Continuar al pago";
+                if (err.status === 409) {           // alguien tomó el asiento: recargar el mapa
+                    seleccion.clear();
+                    pintarResumen();
+                    pintarPasajeros();
+                    cargar();
+                }
+                if (err.status === 401) pintarNotaLogin();
+            }
+        });
+
+        cargar();
+    </script>
+
+</body>
+</html>

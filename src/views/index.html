@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BusGlow | Compra pasajes de bus</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --blue: #0b2d4d;
+            --blue-light: #164a73;
+            --orange: #ff7a00;
+            --green: #16a085;
+            --text: #263238;
+            --muted: #718096;
+            --background: #f5f7fa;
+            --white: #ffffff;
+            --border: #e4e8ed;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            height: 72px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 25px;
+            font-weight: 800;
+            color: var(--blue);
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), #ff7043);
+            color: white;
+            border-radius: 12px;
+            font-size: 22px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #475569;
+            font-size: 14px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .nav-login {
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 8px;
+        }
+
+        .nav-login:hover {
+            background: #fff5f5;
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            min-height: 520px;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(5, 31, 54, .94),
+                    rgba(5, 31, 54, .68),
+                    rgba(5, 31, 54, .35)
+                ),
+                url("https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1800&q=85")
+                center/cover;
+
+            padding: 70px 6% 120px;
+            color: white;
+        }
+
+        .hero-content {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        .hero-text {
+            max-width: 650px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,.14);
+            border: 1px solid rgba(255,255,255,.2);
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 5vw, 58px);
+            line-height: 1.05;
+            margin-bottom: 18px;
+            font-weight: 800;
+        }
+
+        .hero h1 span {
+            color: #ff7043;
+        }
+
+        .hero-description {
+            font-size: 17px;
+            line-height: 1.7;
+            color: #e4edf5;
+            max-width: 580px;
+        }
+
+        /* =========================
+           SEARCH BOX
+        ========================= */
+
+        .search-box {
+            max-width: 1150px;
+            margin: -75px auto 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 18px 45px rgba(0,0,0,.15);
+            padding: 24px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .trip-type {
+            display: flex;
+            gap: 22px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .trip-option {
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            color: #64748b;
+            padding-bottom: 10px;
+        }
+
+        .trip-option.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 110px auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .field {
+            position: relative;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 7px;
+        }
+
+        .field-input {
+            width: 100%;
+            height: 52px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 0 14px;
+            outline: none;
+            color: var(--text);
+            background: white;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+        .field-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(229,57,53,.08);
+        }
+
+        .swap-button {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            position: absolute;
+            right: -25px;
+            bottom: 7px;
+            z-index: 2;
+            color: var(--primary);
+            font-size: 18px;
+            box-shadow: 0 3px 8px rgba(0,0,0,.08);
+        }
+
+        .search-button {
+            height: 52px;
+            padding: 0 28px;
+            border: none;
+            border-radius: 9px;
+            background: var(--primary);
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: .2s;
+            white-space: nowrap;
+        }
+
+        .search-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* =========================
+           QUICK FEATURES
+        ========================= */
+
+        .features {
+            max-width: 1150px;
+            margin: 45px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .feature {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            min-width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff0ef;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .feature h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .feature p {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .container {
+            max-width: 1150px;
+            margin: 70px auto;
+            padding: 0 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 27px;
+            color: var(--blue);
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .see-more {
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           PROMO
+        ========================= */
+
+        .promo {
+            background:
+                linear-gradient(110deg, #0b2d4d, #164a73);
+            border-radius: 18px;
+            min-height: 210px;
+            padding: 35px 45px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 70px;
+        }
+
+        .promo::after {
+            content: "✈";
+            position: absolute;
+            right: 80px;
+            top: -25px;
+            font-size: 180px;
+            color: rgba(255,255,255,.05);
+            transform: rotate(-15deg);
+        }
+
+        .promo-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .promo small {
+            color: #ffb199;
+            font-weight: 700;
+        }
+
+        .promo h2 {
+            font-size: 30px;
+            margin: 8px 0;
+        }
+
+        .promo p {
+            color: #d9e7f2;
+            font-size: 14px;
+        }
+
+        .promo-button {
+            position: relative;
+            z-index: 3;
+            background: white;
+            color: var(--blue);
+            border: none;
+            border-radius: 8px;
+            padding: 13px 22px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* =========================
+           ROUTES
+        ========================= */
+
+        .routes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .route-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: .25s;
+        }
+
+        .route-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(0,0,0,.12);
+        }
+
+        .route-image {
+            height: 175px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .route-badge {
+            position: absolute;
+            top: 13px;
+            left: 13px;
+            background: white;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 7px 10px;
+            border-radius: 20px;
+        }
+
+        .route-info {
+            padding: 20px;
+        }
+
+        .route-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .route-title h3 {
+            font-size: 17px;
+            color: var(--blue);
+        }
+
+        .route-arrow {
+            color: var(--primary);
+        }
+
+        .route-info p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .route-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            margin-top: 18px;
+        }
+
+        .price-label {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .price {
+            color: var(--primary);
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .route-button {
+            border: 1px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 7px;
+            padding: 8px 13px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .route-button:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* =========================
+           STEPS
+        ========================= */
+
+        .steps-section {
+            background: white;
+            padding: 65px 20px;
+        }
+
+        .steps {
+            max-width: 1000px;
+            margin: 40px auto 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 35px;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 55px;
+            height: 55px;
+            background: #fff0ef;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .step h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--blue);
+        }
+
+        .step p {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           NEWSLETTER
+        ========================= */
+
+        .newsletter {
+            max-width: 850px;
+            margin: 70px auto;
+            text-align: center;
+            background: linear-gradient(135deg, #fff1ed, #fff);
+            border: 1px solid #ffe0d9;
+            border-radius: 18px;
+            padding: 40px;
+        }
+
+        .newsletter h2 {
+            color: var(--blue);
+            margin-bottom: 10px;
+        }
+
+        .newsletter p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 22px;
+        }
+
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: auto;
+            gap: 8px;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            height: 48px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0 15px;
+            outline: none;
+        }
+
+        .newsletter-form button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            background: #081c2c;
+            color: white;
+            padding: 55px 6% 25px;
+        }
+
+        .footer-content {
+            max-width: 1150px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-brand p {
+            color: #9fb0bd;
+            font-size: 13px;
+            line-height: 1.7;
+            max-width: 350px;
+            margin-top: 15px;
+        }
+
+        .footer-column h4 {
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .footer-column a {
+            display: block;
+            color: #9fb0bd;
+            font-size: 13px;
+            margin-bottom: 11px;
+        }
+
+        .footer-column a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            max-width: 1150px;
+            margin: 40px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,.1);
+            color: #718596;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            nav {
+                gap: 15px;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .search-button {
+                width: 100%;
+            }
+
+            .features {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .routes-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            header {
+                padding: 0 20px;
+            }
+
+            nav a:not(.nav-login) {
+                display: none;
+            }
+
+            .hero {
+                padding: 50px 20px 100px;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+            }
+
+            .search-box {
+                margin: -60px 15px 0;
+                padding: 18px;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .swap-button {
+                right: 10px;
+                bottom: -20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                padding: 0 15px;
+            }
+
+            .routes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                align-items: start;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .promo {
+                padding: 30px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 25px;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .newsletter {
+                margin: 50px 15px;
+                padding: 30px 20px;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-form button {
+                height: 48px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <a href="index.html" class="logo">
+            <div class="logo-icon">🚌</div>
+            Bus<span>Glow</span>
+        </a>
+
+        <nav>
+            <a href="#inicio">Inicio</a>
+            <a href="#rutas">Rutas</a>
+            <a href="#ofertas">Ofertas</a>
+            <a href="nosotros.html">Nosotros</a>
+            <a href="admin.html" data-staff-link style="display:none">⚙️ Panel</a>
+            <a href="login.html" class="nav-login" data-auth-link>👤 Ingresar</a>
+        </nav>
+
+    </header>
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero" id="inicio">
+
+        <div class="hero-content">
+
+            <div class="hero-text">
+
+                <div class="hero-badge">
+                    ✨ Viaja por todo el Perú
+                </div>
+
+                <h1>
+                    Tu próximo viaje
+                    comienza <span>aquí.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Compara horarios, precios y empresas de transporte.
+                    Encuentra tu pasaje ideal de forma rápida, segura y sencilla.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= SEARCH ================= -->
+
+    <div class="search-box">
+
+        <div class="trip-type">
+
+            <div class="trip-option active" data-tipo="ida-vuelta" onclick="cambiarTipoViaje('ida-vuelta')">
+                ● Ida y vuelta
+            </div>
+
+            <div class="trip-option" data-tipo="ida" onclick="cambiarTipoViaje('ida')">
+                ○ Solo ida
+            </div>
+
+        </div>
+
+        <form id="searchForm">
+
+            <div class="search-grid">
+
+                <div class="field">
+
+                    <label for="origen">DESDE</label>
+
+                    <select id="origen" class="field-input" required>
+                        <option value="">Selecciona origen</option>
+                        <option value="lima">Lima</option>
+                        <option value="arequipa">Arequipa</option>
+                        <option value="cusco">Cusco</option>
+                        <option value="trujillo">Trujillo</option>
+                        <option value="ica">Ica</option>
+                        <option value="chiclayo">Chiclayo</option>
+                        <option value="huaraz">Huaraz</option>
+                    </select>
+
+                    <button
+                        type="button"
+                        class="swap-button"
+                        onclick="intercambiarCiudades()"
+                        title="Intercambiar ciudades">
+                        ⇄
+                    </button>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="destino">HASTA</label>
+
+                    <select id="destino" class="field-input" required>
+                        <option value="">Selecciona destino</option>
+                        <option value="lima">Lima</option>
+                        <option value="arequipa">Arequipa</option>
+                        <option value="cusco">Cusco</option>
+                        <option value="trujillo">Trujillo</option>
+                        <option value="ica">Ica</option>
+                        <option value="chiclayo">Chiclayo</option>
+                        <option value="huaraz">Huaraz</option>
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="fecha">FECHA DE IDA</label>
+
+                    <input
+                        type="date"
+                        id="fecha"
+                        class="field-input"
+                        required>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="regreso">FECHA DE REGRESO</label>
+
+                    <input
+                        type="date"
+                        id="regreso"
+                        class="field-input">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="pasajeros">PASAJEROS</label>
+
+                    <select id="pasajeros" class="field-input">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="search-button">
+                    🔎 Buscar buses
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ================= BENEFITS ================= -->
+
+    <section class="features">
+
+        <div class="feature">
+
+            <div class="feature-icon">🔒</div>
+
+            <div>
+                <h3>Compra segura</h3>
+                <p>
+                    Protegemos tus datos durante todo el proceso.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">💰</div>
+
+            <div>
+                <h3>Mejores precios</h3>
+                <p>
+                    Compara diferentes opciones antes de comprar.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">🚌</div>
+
+            <div>
+                <h3>Muchas empresas</h3>
+                <p>
+                    Encuentra diferentes operadores y servicios.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="feature">
+
+            <div class="feature-icon">⚡</div>
+
+            <div>
+                <h3>Compra rápida</h3>
+                <p>
+                    Reserva tu asiento en pocos pasos.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="container">
+
+
+        <!-- PROMOTION -->
+
+        <section class="promo" id="ofertas">
+
+            <div class="promo-content">
+
+                <small>🔥 OFERTA ESPECIAL</small>
+
+                <h2>Viaja más, paga menos</h2>
+
+                <p>
+                    Encuentra promociones especiales para tus próximos viajes.
+                </p>
+
+            </div>
+
+            <button
+                class="promo-button"
+                onclick="mostrarOferta()">
+                Ver ofertas
+            </button>
+
+        </section>
+
+
+        <!-- POPULAR ROUTES -->
+
+        <section id="rutas">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>Rutas populares</h2>
+
+                    <p>
+                        Descubre los destinos favoritos de nuestros viajeros.
+                    </p>
+                </div>
+
+                <a href="#" class="see-more" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">
+                    Buscar otra ruta →
+                </a>
+
+            </div>
+
+
+            <div class="routes-grid">
+
+
+                <!-- ROUTE 1 -->
+
+                <article class="route-card">
+
+                    <div
+                        class="route-image"
+                        style="
+                        background-image:
+                        url('https://images.unsplash.com/photo-1530789253388-582c481c54b0?auto=format&fit=crop&w=900&q=80');
+                        ">
+
+                        <span class="route-badge">
+                            ⭐ Popular
+                        </span>
+
+                    </div>
+
+                    <div class="route-info">
+
+                        <div class="route-title">
+
+                            <h3>Lima → Cusco</h3>
+
+                            <span class="route-arrow">→</span>
+
+                        </div>
+
+                        <p>
+                            Diferentes horarios y servicios
+                            para viajar cómodamente.
+                        </p>
+
+                        <div class="route-bottom">
+
+                            <div>
+                                <div class="price-label">
+                                    Desde
+                                </div>
+
+                                <div class="price" data-precio-ruta="Lima|Cusco">
+                                    S/ 85
+                                </div>
+                            </div>
+
+                            <button
+                                class="route-button"
+                                onclick="seleccionarRuta('Lima','Cusco')">
+                                Ver viajes
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- ROUTE 2 -->
+
+                <article class="route-card">
+
+                    <div
+                        class="route-image"
+                        style="
+                        background-image:
+                        url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80');
+                        ">
+
+                        <span class="route-badge">
+                            🔥 Oferta
+                        </span>
+
+                    </div>
+
+                    <div class="route-info">
+
+                        <div class="route-title">
+
+                            <h3>Lima → Arequipa</h3>
+
+                            <span class="route-arrow">→</span>
+
+                        </div>
+
+                        <p>
+                            Viaja en servicios cama y
+                            semicama.
+                        </p>
+
+                        <div class="route-bottom">
+
+                            <div>
+                                <div class="price-label">
+                                    Desde
+                                </div>
+
+                                <div class="price" data-precio-ruta="Lima|Arequipa">
+                                    S/ 60
+                                </div>
+                            </div>
+
+                            <button
+                                class="route-button"
+                                onclick="seleccionarRuta('Lima','Arequipa')">
+                                Ver viajes
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- ROUTE 3 -->
+
+                <article class="route-card">
+
+                    <div
+                        class="route-image"
+                        style="
+                        background-image:
+                        url('https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?auto=format&fit=crop&w=900&q=80');
+                        ">
+
+                        <span class="route-badge">
+                            💚 Recomendado
+                        </span>
+
+                    </div>
+
+                    <div class="route-info">
+
+                        <div class="route-title">
+
+                            <h3>Cusco → Puno</h3>
+
+                            <span class="route-arrow">→</span>
+
+                        </div>
+
+                        <p>
+                            Una ruta ideal para descubrir
+                            el sur del Perú.
+                        </p>
+
+                        <div class="route-bottom">
+
+                            <div>
+                                <div class="price-label">
+                                    Desde
+                                </div>
+
+                                <div class="price" data-precio-ruta="Cusco|Puno">
+                                    S/ 45
+                                </div>
+                            </div>
+
+                            <button
+                                class="route-button"
+                                onclick="seleccionarRuta('Cusco','Puno')">
+                                Ver viajes
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= HOW IT WORKS ================= -->
+
+    <section class="steps-section">
+
+        <div class="section-header"
+             style="max-width:1000px;margin:auto;text-align:center;display:block;">
+
+            <h2>¿Cómo comprar tu pasaje?</h2>
+
+            <p>
+                Reserva tu viaje en tres simples pasos.
+            </p>
+
+        </div>
+
+
+        <div class="steps">
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <h3>Busca tu viaje</h3>
+
+                <p>
+                    Selecciona tu origen, destino y fecha.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <h3>Compara opciones</h3>
+
+                <p>
+                    Compara precios, horarios, empresas
+                    y servicios.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <h3>Compra tu pasaje</h3>
+
+                <p>
+                    Elige tu asiento y completa tu compra
+                    de forma segura.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= NEWSLETTER ================= -->
+
+    <section class="newsletter">
+
+        <h2>Recibe nuestras mejores ofertas ✨</h2>
+
+        <p>
+            Suscríbete y entérate de promociones y nuevos destinos.
+        </p>
+
+        <form
+            class="newsletter-form"
+            onsubmit="suscribirse(event)">
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Tu correo electrónico"
+                required>
+
+            <button type="submit">
+                Suscribirme
+            </button>
+
+        </form>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer id="ayuda">
+
+        <div class="footer-content">
+
+
+            <div class="footer-brand">
+
+                <div class="logo" style="color:white;">
+                    <div class="logo-icon">🚌</div>
+                    Bus<span>Glow</span>
+                </div>
+
+                <p>
+                    Tu plataforma para encontrar y comparar
+                    pasajes de bus interprovinciales.
+                    Viaja por el Perú de manera fácil,
+                    rápida y segura.
+                </p>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <h4>BusGlow</h4>
+
+                <a href="#inicio">Inicio</a>
+                <a href="#rutas">Rutas</a>
+                <a href="#ofertas">Ofertas</a>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <h4>Ayuda</h4>
+
+                <a href="#">Preguntas frecuentes</a>
+                <a href="#">Contacto</a>
+                <a href="#">Términos y condiciones</a>
+                <a href="#">Política de privacidad</a>
+
+            </div>
+
+
+            <div class="footer-column">
+
+                <h4>Síguenos</h4>
+
+                <a href="#">Facebook</a>
+                <a href="#">Instagram</a>
+                <a href="#">TikTok</a>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            © 2026 BusGlow. Todos los derechos reservados.
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script src="js/api.js"></script>
+    <script>
+        const { api, fmt, toast, esc } = BusGlow;
+        let tipoViaje = 'ida-vuelta';
+
+        // Fecha mínima: hoy
+        const fechaActual = fmt.hoy();
+        document.getElementById("fecha").min = fechaActual;
+        document.getElementById("regreso").min = fechaActual;
+        document.getElementById("fecha").value = fechaActual;
+
+        document.getElementById("fecha").addEventListener("change", e => {
+            document.getElementById("regreso").min = e.target.value;
+        });
+
+        // Cargar ciudades desde la base de datos
+        async function cargarCiudades() {
+            try {
+                const ciudades = await api('/ciudades', { auth: false });
+                ["origen", "destino"].forEach(id => {
+                    const select = document.getElementById(id);
+                    const actual = select.value;
+                    select.innerHTML = `<option value="">Selecciona ${id}</option>` +
+                        ciudades.map(c => `<option value="${esc(c.nombre)}">${esc(c.nombre)}</option>`).join("");
+                    select.value = actual;
+                });
+            } catch (err) {
+                toast(err.message, "error", 6000);
+            }
+        }
+
+        // Precios "desde" de las rutas populares
+        async function cargarPrecios() {
+            try {
+                const rutas = await api('/rutas/populares', { auth: false });
+                rutas.forEach(r => {
+                    const el = document.querySelector(`[data-precio-ruta="${r.origen}|${r.destino}"]`);
+                    if (el) el.textContent = `S/ ${Math.round(r.precio_desde)}`;
+                });
+            } catch { /* se mantienen los precios de referencia */ }
+        }
+
+        function cambiarTipoViaje(tipo) {
+            tipoViaje = tipo;
+            document.querySelectorAll(".trip-option").forEach(el => {
+                const activo = el.dataset.tipo === tipo;
+                el.classList.toggle("active", activo);
+                el.textContent = (activo ? "● " : "○ ") + (el.dataset.tipo === "ida" ? "Solo ida" : "Ida y vuelta");
+            });
+            const regreso = document.getElementById("regreso");
+            regreso.disabled = tipo === "ida";
+            if (tipo === "ida") regreso.value = "";
+            regreso.closest(".field").style.opacity = tipo === "ida" ? ".45" : "1";
+        }
+
+        // Intercambiar origen y destino
+        function intercambiarCiudades() {
+            const origen = document.getElementById("origen");
+            const destino = document.getElementById("destino");
+            const temporal = origen.value;
+            origen.value = destino.value;
+            destino.value = temporal;
+        }
+
+        // Buscador -> página de resultados
+        document.getElementById("searchForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const origen = document.getElementById("origen").value;
+            const destino = document.getElementById("destino").value;
+            const fecha = document.getElementById("fecha").value;
+            const regreso = document.getElementById("regreso").value;
+            const pasajeros = document.getElementById("pasajeros").value;
+
+            if (origen === destino) {
+                toast("El origen y el destino no pueden ser iguales.", "warn");
+                return;
+            }
+            if (tipoViaje === "ida-vuelta" && regreso && regreso < fecha) {
+                toast("La fecha de regreso no puede ser anterior a la de ida.", "warn");
+                return;
+            }
+
+            const q = new URLSearchParams({ origen, destino, fecha, pasajeros });
+            if (tipoViaje === "ida-vuelta" && regreso) q.set("regreso", regreso);
+            location.href = "resultados.html?" + q.toString();
+        });
+
+        // Seleccionar ruta popular
+        function seleccionarRuta(origen, destino) {
+            document.getElementById("origen").value = origen;
+            document.getElementById("destino").value = destino;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            toast(`Ruta ${origen} → ${destino} seleccionada. Elige la fecha y busca.`);
+        }
+
+        function mostrarOferta() {
+            toast("🎉 Viaja de lunes a viernes y paga hasta 10 % menos que en fin de semana.", "ok", 5000);
+            document.getElementById("rutas").scrollIntoView({ behavior: "smooth" });
+        }
+
+        // Newsletter
+        async function suscribirse(event) {
+            event.preventDefault();
+            const input = document.getElementById("email");
+            try {
+                const r = await api('/suscripciones', { method: 'POST', body: { correo: input.value }, auth: false });
+                toast("✅ " + r.mensaje, "ok");
+                input.value = "";
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        }
+
+        cargarCiudades();
+        cargarPrecios();
+    </script>
+
+</body>
+</html>

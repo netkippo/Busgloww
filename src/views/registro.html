@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusGlow | Crear cuenta</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary:#e53935;
+            --primary-dark:#c62828;
+            --blue:#0b2d4d;
+            --muted:#718096;
+            --border:#e4e8ed;
+        }
+
+        * {
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+        }
+
+        body {
+            font-family:Inter,sans-serif;
+            background:#f5f7fa;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:30px;
+        }
+
+        .register-container {
+            width:100%;
+            max-width:520px;
+        }
+
+        .logo {
+            text-align:center;
+            color:var(--blue);
+            font-size:30px;
+            font-weight:800;
+            margin-bottom:25px;
+        }
+
+        .logo span {
+            color:var(--primary);
+        }
+
+        .card {
+            background:white;
+            border-radius:18px;
+            padding:35px;
+            box-shadow:0 15px 40px rgba(0,0,0,.08);
+        }
+
+        h1 {
+            color:var(--blue);
+            text-align:center;
+            margin-bottom:8px;
+        }
+
+        .subtitle {
+            color:var(--muted);
+            text-align:center;
+            font-size:14px;
+            margin-bottom:25px;
+        }
+
+        .grid {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:15px;
+        }
+
+        .field {
+            margin-bottom:15px;
+        }
+
+        .full {
+            grid-column:1/-1;
+        }
+
+        label {
+            display:block;
+            font-size:12px;
+            font-weight:700;
+            color:#475569;
+            margin-bottom:7px;
+        }
+
+        input {
+            width:100%;
+            height:48px;
+            border:1px solid var(--border);
+            border-radius:8px;
+            padding:0 13px;
+            font-family:inherit;
+            outline:none;
+        }
+
+        input:focus {
+            border-color:var(--primary);
+        }
+
+        .terms {
+            display:flex;
+            gap:8px;
+            font-size:12px;
+            color:var(--muted);
+            margin:8px 0 20px;
+        }
+
+        .terms input {
+            width:auto;
+            height:auto;
+        }
+
+        button {
+            width:100%;
+            height:50px;
+            border:0;
+            border-radius:8px;
+            background:var(--primary);
+            color:white;
+            font-weight:800;
+            cursor:pointer;
+        }
+
+        button:hover {
+            background:var(--primary-dark);
+        }
+
+        .login {
+            text-align:center;
+            margin-top:20px;
+            color:var(--muted);
+            font-size:13px;
+        }
+
+        .login a {
+            color:var(--primary);
+            font-weight:700;
+            text-decoration:none;
+        }
+
+        @media(max-width:600px) {
+            .grid {
+                grid-template-columns:1fr;
+            }
+
+            .full {
+                grid-column:auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="register-container">
+
+    <a href="index.html" class="logo" style="display:block;text-decoration:none">
+        🚌 Bus<span>Glow</span>
+    </a>
+
+    <div class="card">
+
+        <h1>Crear una cuenta</h1>
+
+        <p class="subtitle">
+            Regístrate para gestionar tus viajes y boletos.
+        </p>
+
+        <form onsubmit="registrar(event)">
+
+            <div class="grid">
+
+                <div class="field">
+                    <label>NOMBRE</label>
+                    <input type="text" id="nombre" required>
+                </div>
+
+                <div class="field">
+                    <label>APELLIDOS</label>
+                    <input type="text" id="apellido" required>
+                </div>
+
+                <div class="field">
+                    <label>DNI</label>
+                    <input type="text" id="dni" maxlength="8" inputmode="numeric" pattern="\d{8}" title="8 dígitos" required>
+                </div>
+
+                <div class="field">
+                    <label>TELÉFONO</label>
+                    <input type="tel" id="telefono" required>
+                </div>
+
+                <div class="field full">
+                    <label>CORREO ELECTRÓNICO</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div class="field">
+                    <label>CONTRASEÑA</label>
+                    <input type="password" id="password" minlength="8" placeholder="Mín. 8, letras y números" required>
+                </div>
+
+                <div class="field">
+                    <label>CONFIRMAR CONTRASEÑA</label>
+                    <input type="password" id="confirmar" required>
+                </div>
+
+            </div>
+
+            <label class="terms">
+                <input type="checkbox" required>
+                Acepto los términos y condiciones.
+            </label>
+
+            <button type="submit" id="btnRegistro">
+                Crear cuenta
+            </button>
+
+        </form>
+
+        <div class="login">
+            ¿Ya tienes una cuenta?
+            <a href="login.html" id="linkLogin">Iniciar sesión</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script>
+const { api, session, toast, params } = BusGlow;
+const next = params.get("next");
+if (next) document.getElementById("linkLogin").href = "login.html?next=" + encodeURIComponent(next);
+
+async function registrar(event) {
+    event.preventDefault();
+
+    const valor = id => document.getElementById(id).value.trim();
+    const password = document.getElementById("password").value;
+    const confirmar = document.getElementById("confirmar").value;
+
+    if (password !== confirmar) {
+        toast("Las contraseñas no coinciden.", "warn");
+        return;
+    }
+    if (!/^\d{8}$/.test(valor("dni"))) {
+        toast("El DNI debe tener 8 dígitos.", "warn");
+        return;
+    }
+
+    const btn = document.getElementById("btnRegistro");
+    btn.disabled = true;
+    btn.textContent = "Creando cuenta...";
+    try {
+        const r = await api("/auth/registro", {
+            method: "POST",
+            auth: false,
+            body: {
+                nombres: valor("nombre"),
+                apellidos: valor("apellido"),
+                dni: valor("dni"),
+                telefono: valor("telefono"),
+                correo: valor("email"),
+                password
+            }
+        });
+        session.set(r.token, r.usuario);
+        toast("¡Cuenta creada correctamente!", "ok");
+        setTimeout(() => {
+            location.href = next && /^[a-z]+\.html/i.test(next) ? next : "perfil.html";
+        }, 600);
+    } catch (err) {
+        toast(err.message, "error", 5000);
+        btn.disabled = false;
+        btn.textContent = "Crear cuenta";
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BusGlow | Mi perfil</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --blue: #0b2d4d;
+            --blue-light: #164a73;
+            --text: #263238;
+            --muted: #718096;
+            --background: #f5f7fa;
+            --white: #ffffff;
+            --border: #e4e8ed;
+            --green: #16a085;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        /* HEADER */
+
+        header {
+            height: 72px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 25px;
+            font-weight: 800;
+            color: var(--blue);
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), #ff7043);
+            color: white;
+            border-radius: 12px;
+            font-size: 22px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        nav a {
+            color: #475569;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .nav-profile {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: #fff5f5;
+            color: var(--primary);
+            padding: 9px 14px;
+            border-radius: 9px;
+        }
+
+        /* PAGE */
+
+        .page {
+            max-width: 1150px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            color: var(--blue);
+            font-size: 30px;
+            margin-bottom: 7px;
+        }
+
+        .page-title p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* PROFILE */
+
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            height: fit-content;
+        }
+
+        .avatar {
+            width: 105px;
+            height: 105px;
+            margin: 0 auto 17px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0b2d4d, #164a73);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            font-weight: 800;
+            border: 5px solid #edf3f8;
+        }
+
+        .profile-card h2 {
+            color: var(--blue);
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .profile-card p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .verified {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 12px;
+            background: #eafaf5;
+            color: var(--green);
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .profile-menu {
+            margin-top: 25px;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+
+        .profile-menu button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            text-align: left;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .profile-menu button:hover,
+        .profile-menu button.active {
+            background: #fff0ef;
+            color: var(--primary);
+        }
+
+        /* CONTENT */
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 27px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h2 {
+            color: var(--blue);
+            font-size: 19px;
+        }
+
+        .card-header span {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* FORM */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 7px;
+        }
+
+        .form-group input {
+            width: 100%;
+            height: 47px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0 13px;
+            outline: none;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(229,57,53,.08);
+        }
+
+        .save-button {
+            margin-top: 22px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background: var(--primary-dark);
+        }
+
+        /* TRIPS */
+
+        .trip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .trip:last-child {
+            margin-bottom: 0;
+        }
+
+        .trip-route {
+            color: var(--blue);
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .trip-info {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .trip-status {
+            background: #eafaf5;
+            color: var(--green);
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .trip-status.completed {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        /* STATISTICS */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .stat strong {
+            display: block;
+            color: var(--blue);
+            font-size: 22px;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* DANGER */
+
+        .logout {
+            color: var(--primary);
+            border: 1px solid #ffd2cf;
+            background: #fff7f6;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .logout:hover {
+            background: #ffeceb;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #081c2c;
+            color: white;
+            padding: 30px 6%;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            max-width: 1150px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-content p {
+            color: #9fb0bd;
+            font-size: 12px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 800px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card {
+                max-width: 500px;
+                margin: auto;
+                width: 100%;
+            }
+
+            .profile-menu {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 0 20px;
+            }
+
+            nav a:not(.nav-profile) {
+                display: none;
+            }
+
+            .page {
+                margin-top: 30px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .trip {
+                align-items: flex-start;
+                gap: 12px;
+                flex-direction: column;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+
+        .form-group input[readonly] { background: #f8fafc; color: var(--muted); }
+        .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tabs button { border: 1px solid var(--border); background: white; border-radius: 20px; padding: 7px 14px; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer; }
+        .tabs button.active { background: var(--blue); border-color: var(--blue); color: white; }
+        .trip-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+        .trip-actions a, .trip-actions button { border: 1px solid var(--border); background: white; border-radius: 7px; padding: 7px 11px; font-size: 11px; font-weight: 700; color: var(--blue); cursor: pointer; font-family: inherit; }
+        .trip-actions .danger { color: var(--primary); border-color: #ffd2cf; }
+        .trip-status.pending { background: #fff8e6; color: #9a6b00; }
+        .trip-status.cancelled { background: #ffecec; color: var(--primary); }
+        .empty-trips { color: var(--muted); font-size: 13px; text-align: center; padding: 20px; }
+        .trip-note { font-size: 12px; margin-top: 6px; color: #9a6b00; }
+        .trip-note.ok { color: #16815f; }
+        .aviso { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; font-size: 13px; }
+        .aviso.nuevo { border-color: #ffd2cf; background: #fff8f7; }
+        .aviso b { color: var(--blue); display: block; margin-bottom: 4px; }
+        .aviso small { color: var(--muted); font-size: 11px; }
+        .menu-count { background: var(--primary); color: white; border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: 6px; }
+        .empty-trips a { color: var(--primary); font-weight: 700; }
+        .role-badge { display: inline-block; margin-top: 8px; background: #eef4fb; color: var(--blue); padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header>
+
+        <a href="index.html" class="logo">
+            <div class="logo-icon">🚌</div>
+            Bus<span>Glow</span>
+        </a>
+
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="index.html#rutas">Rutas</a>
+            <a href="index.html#ofertas">Ofertas</a>
+            <a href="admin.html" data-staff-link style="display:none">⚙️ Panel</a>
+            <a href="perfil.html" class="nav-profile">👤 Mi perfil</a>
+        </nav>
+
+    </header>
+
+
+    <!-- CONTENIDO -->
+
+    <main class="page">
+
+        <div class="page-title">
+            <h1>Mi perfil</h1>
+            <p>Administra tus datos personales y consulta tus viajes.</p>
+        </div>
+
+
+        <div class="profile-layout">
+
+            <!-- PERFIL LATERAL -->
+
+            <aside class="profile-card">
+
+                <div class="avatar" id="avatar">··</div>
+
+                <h2 id="profileName">Cargando...</h2>
+
+                <p id="profileEmail"></p>
+
+                <div class="verified">✓ Cuenta verificada</div>
+                <div id="roleBadge"></div>
+
+                <div class="profile-menu">
+
+                    <button class="active" onclick="mostrarSeccion('datos', this)">👤 Datos personales</button>
+                    <button onclick="mostrarSeccion('viajes', this)">🚌 Mis viajes</button>
+                    <button onclick="mostrarSeccion('avisos', this)">🔔 Avisos<span id="avisosCount"></span></button>
+                    <button onclick="mostrarSeccion('seguridad', this)">🔒 Seguridad</button>
+                    <button onclick="cerrarSesion()">🚪 Cerrar sesión</button>
+
+                </div>
+
+            </aside>
+
+
+            <!-- CONTENIDO DERECHO -->
+
+            <section class="content">
+
+                <!-- DATOS PERSONALES -->
+
+                <div class="card" id="datos">
+
+                    <div class="card-header">
+                        <h2>Datos personales</h2>
+                        <span>Actualiza tu información</span>
+                    </div>
+
+                    <form id="profileForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>NOMBRES</label>
+                                <input type="text" id="nombre" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>APELLIDOS</label>
+                                <input type="text" id="apellido" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>CORREO ELECTRÓNICO</label>
+                                <input type="email" id="correo" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>TELÉFONO</label>
+                                <input type="tel" id="telefono">
+                            </div>
+
+                            <div class="form-group">
+                                <label>DOCUMENTO DE IDENTIDAD</label>
+                                <input type="text" id="dni" readonly title="Para cambiar tu DNI comunícate con soporte">
+                            </div>
+
+                            <div class="form-group">
+                                <label>FECHA DE NACIMIENTO</label>
+                                <input type="date" id="nacimiento">
+                            </div>
+
+                        </div>
+
+                        <button type="submit" class="save-button">Guardar cambios</button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- ESTADÍSTICAS -->
+
+                <div class="card">
+
+                    <div class="card-header">
+                        <h2>Resumen de viajes</h2>
+                        <span>Tu actividad en BusGlow</span>
+                    </div>
+
+                    <div class="stats">
+
+                        <div class="stat">
+                            <div class="stat-icon">🚌</div>
+                            <strong id="statViajes">0</strong>
+                            <span>Viajes realizados</span>
+                        </div>
+
+                        <div class="stat">
+                            <div class="stat-icon">📍</div>
+                            <strong id="statDestinos">0</strong>
+                            <span>Destinos visitados</span>
+                        </div>
+
+                        <div class="stat">
+                            <div class="stat-icon">💰</div>
+                            <strong id="statTotal">S/ 0</strong>
+                            <span>Invertido en pasajes</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- VIAJES -->
+
+                <div class="card" id="viajes">
+
+                    <div class="card-header">
+                        <h2>Mis viajes</h2>
+                        <span id="viajesResumen">Reservas activas</span>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="active" data-tab="proximos">Próximos</button>
+                        <button data-tab="historial">Historial</button>
+                    </div>
+
+                    <div id="listaViajes"><div class="empty-trips">Cargando viajes...</div></div>
+
+                </div>
+
+
+                <!-- AVISOS -->
+
+                <div class="card" id="avisos">
+
+                    <div class="card-header">
+                        <h2>Avisos</h2>
+                        <span>Compras, cancelaciones, reembolsos y cambios de viaje</span>
+                    </div>
+
+                    <div id="listaAvisos"><div class="empty-trips">Cargando avisos...</div></div>
+
+                </div>
+
+
+                <!-- SEGURIDAD -->
+
+                <div class="card" id="seguridad">
+
+                    <div class="card-header">
+                        <h2>Seguridad</h2>
+                        <span>Protege tu cuenta</span>
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label>CONTRASEÑA ACTUAL</label>
+                            <input type="password" id="passActual" placeholder="••••••••" autocomplete="current-password">
+                        </div>
+
+                        <div class="form-group">
+                            <label>NUEVA CONTRASEÑA</label>
+                            <input type="password" id="passNueva" placeholder="Mín. 8 caracteres, letras y números" autocomplete="new-password">
+                        </div>
+
+                    </div>
+
+                    <button class="save-button" onclick="cambiarPassword()">Actualizar contraseña</button>
+
+                </div>
+
+
+                <!-- CERRAR SESIÓN -->
+
+                <div class="card">
+
+                    <div class="card-header">
+                        <div>
+                            <h2>Cerrar sesión</h2>
+                            <span>Sal de tu cuenta de BusGlow</span>
+                        </div>
+
+                        <button class="logout" onclick="cerrarSesion()">Cerrar sesión</button>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <div class="logo" style="color:white;">
+                <div class="logo-icon">🚌</div>
+                Bus<span>Glow</span>
+            </div>
+
+            <p>© 2026 BusGlow. Todos los derechos reservados.</p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="js/api.js"></script>
+    <script>
+        const { api, fmt, esc, toast, session, requireLogin, logout } = BusGlow;
+        requireLogin();
+
+        let reservas = [];
+        let tab = "proximos";
+        const $ = id => document.getElementById(id);
+
+        function pintarUsuario(u) {
+            $("profileName").textContent = `${u.nombres} ${u.apellidos}`;
+            $("profileEmail").textContent = u.correo;
+            $("avatar").textContent = fmt.iniciales(u.nombres, u.apellidos);
+            $("roleBadge").innerHTML = u.rol !== "CLIENTE" ? `<span class="role-badge">${u.rol}</span>` : "";
+            $("nombre").value = u.nombres;
+            $("apellido").value = u.apellidos;
+            $("correo").value = u.correo;
+            $("telefono").value = u.telefono || "";
+            $("dni").value = u.dni;
+            $("nacimiento").value = u.fecha_nacimiento || "";
+        }
+
+        async function cargar() {
+            try {
+                const [u, resumen, mis, avisos] = await Promise.all([
+                    api("/auth/me"), api("/auth/me/resumen"), api("/reservas/mis"), api("/auth/me/notificaciones")
+                ]);
+                pintarAvisos(avisos);
+                session.updateUser(u);
+                BusGlow.renderHeader();
+                pintarUsuario(u);
+                $("statViajes").textContent = resumen.viajes_realizados;
+                $("statDestinos").textContent = resumen.destinos;
+                $("statTotal").textContent = `S/ ${Math.round(resumen.total_pagado)}`;
+                reservas = mis;
+                pintarViajes();
+                if (location.hash === "#viajes") mostrarSeccion("viajes");
+                if (location.hash === "#avisos") mostrarSeccion("avisos");
+            } catch (err) {
+                if (err.status === 401) return requireLogin();
+                toast(err.message, "error", 6000);
+            }
+        }
+
+        function pintarViajes() {
+            // también se muestran arriba los viajes cancelados con un reembolso por atender
+            const proximos = reservas.filter(r => (r.futuro && ["Confirmada", "Pendiente"].includes(r.estado)) ||
+                                                  (r.estado === "Cancelada" && r.estado_reembolso === "Pendiente"));
+            const historial = reservas.filter(r => !proximos.includes(r));
+            $("viajesResumen").textContent = `${proximos.length} próximo${proximos.length === 1 ? "" : "s"}`;
+            const lista = tab === "proximos" ? proximos : historial;
+
+            if (!lista.length) {
+                $("listaViajes").innerHTML = tab === "proximos"
+                    ? '<div class="empty-trips">No tienes viajes próximos. <a href="index.html">Busca tu próximo destino →</a></div>'
+                    : '<div class="empty-trips">Aún no tienes viajes en tu historial.</div>';
+                return;
+            }
+
+            $("listaViajes").innerHTML = lista.map(r => {
+                let estado = r.estado, clase = "", nota = "";
+                if (r.estado === "Pendiente") { estado = "Pendiente de pago"; clase = "pending"; }
+                else if (r.estado === "Reubicada") { estado = "Cambiado de viaje"; clase = "completed"; nota = '<div class="trip-note ok">La empresa canceló este viaje y te cambió a otro sin costo: revisa tus próximos viajes.</div>'; }
+                else if (r.estado === "Cancelada") {
+                    clase = "cancelled";
+                    estado = r.motivo_cancelacion === "VIAJE" ? "Viaje cancelado por la empresa" : "Anulada";
+                    if (r.estado_reembolso === "Pendiente") {
+                        nota = `<div class="trip-note">Tienes un reembolso pendiente de ${fmt.money(r.monto_reembolso)}. Puedes pedir la devolución aquí o cambiarte a otro viaje en ventanilla, sin costo.</div>`;
+                    } else if (r.estado_reembolso === "Procesado") {
+                        nota = `<div class="trip-note ok">Reembolsado: ${fmt.money(r.monto_reembolso)}${r.penalidad_reembolso ? ` (retención ${fmt.money(r.penalidad_reembolso)})` : ""} · ${esc(r.codigo_reembolso || "")}</div>`;
+                    }
+                }
+                else if (r.estado_viaje === "Cancelado") { estado = "Viaje cancelado"; clase = "cancelled"; }
+                else if (!r.futuro) { estado = "Completado"; clase = "completed"; }
+                else estado = "Confirmado";
+
+                const acciones = [];
+                if (r.estado === "Confirmada") acciones.push(`<a href="boleto.html?reserva=${r.id_reserva}">🎫 Boleto</a>`);
+                if (r.estado === "Pendiente") acciones.push(`<a href="pago.html?reserva=${r.id_reserva}">💳 Pagar</a>`);
+                if (r.estado === "Cancelada" && r.estado_reembolso === "Pendiente") {
+                    acciones.push(`<button onclick="solicitarReembolso(${r.id_reserva}, ${r.monto_reembolso})">💸 Solicitar reembolso</button>`);
+                }
+                if (r.futuro && (r.estado === "Pendiente" || (r.estado === "Confirmada" && r.horas_para_salida >= 24))) {
+                    acciones.push(`<button class="danger" onclick="cancelarReserva(${r.id_reserva})">Anular</button>`);
+                }
+
+                return `
+                <div class="trip">
+                    <div>
+                        <div class="trip-route">${esc(r.origen)} → ${esc(r.destino)}</div>
+                        <div class="trip-info">📅 ${fmt.fechaLarga(r.fecha_salida)} · 🕘 ${r.hora_salida}</div>
+                        <div class="trip-info">🚌 ${esc(r.empresa)} · ${esc(r.tipo_servicio)} · Asiento${(r.asientos || "").includes(",") ? "s" : ""} ${esc(r.asientos || "-")} · ${fmt.money(r.total)}</div>
+                        ${r.id_reserva_origen ? '<div class="trip-note ok">Viaje asignado por cambio (sin costo)</div>' : ""}
+                        ${nota}
+                    </div>
+                    <div class="trip-actions">
+                        <div class="trip-status ${clase}">${estado}</div>
+                        ${acciones.join("")}
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
+        document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+            tab = b.dataset.tab;
+            document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("active", x === b));
+            pintarViajes();
+        }));
+
+        function pintarAvisos(avisos) {
+            const nuevos = avisos.filter(a => !a.leida).length;
+            $("avisosCount").innerHTML = nuevos ? `<span class="menu-count">${nuevos}</span>` : "";
+            $("listaAvisos").innerHTML = avisos.length ? avisos.map(a => `
+                <div class="aviso ${a.leida ? "" : "nuevo"}">
+                    <b>${esc(a.asunto)}</b>${esc(a.mensaje)}<br><small>${esc(a.fecha)}</small>
+                </div>`).join("") : '<div class="empty-trips">No tienes avisos.</div>';
+        }
+
+        async function solicitarReembolso(id, monto) {
+            if (!confirm(`Se te devolverá ${fmt.money(monto)} (100 %). Si prefieres cambiarte a otro viaje, acércate a ventanilla en lugar de pedir el reembolso. ¿Continuar?`)) return;
+            try {
+                const r = await api(`/reservas/${id}/reembolso`, { method: "POST" });
+                toast(r.mensaje, "ok", 7000);
+                cargar();
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        }
+
+        async function cancelarReserva(id) {
+            if (!confirm("¿Seguro que deseas anular esta reserva? Los asientos quedarán libres. Si ya la pagaste, se te devolverá el monto menos la retención por anulación.")) return;
+            try {
+                const r = await api(`/reservas/${id}/cancelar`, { method: "POST" });
+                toast(r.mensaje, "ok", 7000);
+                cargar();
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        }
+
+        // Guardar cambios del perfil
+        $("profileForm").addEventListener("submit", async event => {
+            event.preventDefault();
+            try {
+                const r = await api("/auth/me", {
+                    method: "PUT",
+                    body: {
+                        nombres: $("nombre").value.trim(),
+                        apellidos: $("apellido").value.trim(),
+                        correo: $("correo").value.trim(),
+                        telefono: $("telefono").value.trim(),
+                        fecha_nacimiento: $("nacimiento").value || null
+                    }
+                });
+                session.updateUser(r.usuario);
+                pintarUsuario(r.usuario);
+                toast("✅ " + r.mensaje, "ok");
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        });
+
+        function mostrarSeccion(seccion, boton) {
+            const el = $(seccion);
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            if (seccion === "avisos" && $("avisosCount").innerHTML) {
+                api("/auth/me/notificaciones/leidas", { method: "POST" }).then(() => { $("avisosCount").innerHTML = ""; }).catch(() => {});
+            }
+            if (boton) {
+                document.querySelectorAll(".profile-menu button").forEach(b => b.classList.toggle("active", b === boton));
+            }
+        }
+
+        async function cambiarPassword() {
+            try {
+                const r = await api("/auth/me/password", {
+                    method: "PUT",
+                    body: { actual: $("passActual").value, nueva: $("passNueva").value }
+                });
+                $("passActual").value = "";
+                $("passNueva").value = "";
+                toast("🔒 " + r.mensaje, "ok");
+            } catch (err) {
+                toast(err.message, "error");
+            }
+        }
+
+        function cerrarSesion() {
+            if (confirm("¿Estás seguro de que deseas cerrar sesión?")) logout();
+        }
+
+        cargar();
+    </script>
+
+</body>
+</html>
